@@ -15,17 +15,23 @@ export default function FileInput() {
       {canUseFilePicker ? (
         <button
           type="button"
+          className="file-input__button"
           onClick={requestInputHandle}
         >
           Open File(s)
         </button>
       ) : (
-        <input
-          className="file-input__input"
-          type="file"
-          multiple
-          onChange={onFileInputChange}
-        />
+        <label
+          className="file-input__button"
+        >
+          Open File(s)
+          <input
+            className="file-input__input"
+            type="file"
+            multiple
+            onChange={onFileInputChange}
+          />
+        </label>
       )}
     </div>
   );

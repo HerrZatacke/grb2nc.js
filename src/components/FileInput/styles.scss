@@ -2,11 +2,19 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  background: #ddd;
-  border: 1px solid #aaa;
-  padding: 20px;
+
+  &__button {
+    background: #ddd;
+    border: 1px solid #aaa;
+    padding: 20px;
+    line-height: 22px;
+    font-size: 18px;
+    height: auto;
+    display: inline-block;
+    cursor: pointer;
+  }
 
   &__input {
-
+    display: none;
   }
 }
