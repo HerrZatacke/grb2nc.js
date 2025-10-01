@@ -1,0 +1,19 @@
+* { box-sizing: border-box; }
+button { font-family: inherit; }
+a { color: inherit; }
+svg { fill: currentColor; }
+
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  text-align: center;
+  margin: 0 0 16px 0;
+  min-width: 250px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #dddddde0; }
+::-webkit-scrollbar-thumb { background: #888888e0; }
+::-webkit-scrollbar-thumb:hover { background: #aaaaaae0; }

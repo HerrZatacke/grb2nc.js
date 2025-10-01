@@ -1,0 +1,14 @@
+.svg-preview {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  &__svg {
+    width: 100vw;
+    height: 100vh;
+    transform: scaleY(-1); // flip the output of svg visually
+  }
+}
