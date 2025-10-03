@@ -23,6 +23,7 @@
     "@types/react-dom": "^19.1.9",
     "@types/wicg-file-system-access": "^2023.10.6",
     "clipper-lib": "^6.4.2",
+    "comlink": "^4.4.2",
     "eslint": "^9.36.0",
     "eslint-config-next": "15.5.4",
     "react-zoom-pan-pinch": "^3.7.0",
