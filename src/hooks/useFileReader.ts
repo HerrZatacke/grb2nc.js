@@ -59,8 +59,8 @@ export const useFileReader = (): UseFileReader => {
     const ext = name.split('.').pop() || '';
     if (!extensions.includes(`.${ext}`)) return null;
 
-    let type: TaskType = TaskType.ISOLATION;
-    let flip = false;
+    let type: TaskType;
+    let flip: boolean;
 
     if (ext === 'drl') {
       type = TaskType.DRILL;
