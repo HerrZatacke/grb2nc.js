@@ -3,7 +3,7 @@ import {Task, TaskProps, TaskType, TaskWithPolygons} from "@/types/tasks.ts";
 import {parse} from "@hpcreery/tracespace-parser";
 import {plot} from "@hpcreery/tracespace-plotter";
 import {transformer} from "@/modules/transformer";
-import {getColor, getOffset, getOffsetStroke, getSteps, polygonsToPath} from "@/modules/render";
+import {getColor, getOffset, getOffsetStroke, getSteps, polygonsToSVGPaths} from "@/modules/renderSVG";
 import {Clipper, type IntPoint, IntRect} from "clipper-lib";
 import {Polygon} from "@/types/geo";
 import {createOffset} from "@/modules/createOffset";
@@ -107,18 +107,20 @@ const api: TansformWorkerApi = {
     const paths = transformedTasks.map(({ polygons, type, flip, steps, offset, hide }): TaskProps[] => {
       const color = getColor(type, flip);
 
-      const polygonsToPathStart = performance.now();
+      const polygonsToSVGPathsStart = performance.now();
 
-      // create filled shape
-      const taskPaths: TaskProps[] = [{
-        path: polygonsToPath(polygons, precision),
+
+      const svgPaths = polygonsToSVGPaths(polygons, precision);
+
+      const taskPaths: TaskProps[] = svgPaths.map((SVGpath) => ({
+        path: SVGpath,
         fill: `rgba(${color}, 0.025)`,
         stroke: `rgba(${color}, 0.33)`,
         strokeWidth: '0.5',
         hide,
-      }];
+      }));
 
-      const polygonsToPathDuration = performance.now() - polygonsToPathStart;
+      const polygonsToSVGPathsDuration = performance.now() - polygonsToSVGPathsStart;
       const clipperOffsetStart = performance.now();
 
       // create preview paths
@@ -135,22 +137,27 @@ const api: TansformWorkerApi = {
       const clipperOffsetDuration = performance.now() - clipperOffsetStart;
       const pathOffsetStart = performance.now();
 
-      taskPaths.push(...offsetPaths.map((offsetPath: Polygon[]) => ({
-        path: polygonsToPath(offsetPath, precision),
-        fill: "none",
-        stroke: `rgba(${color}, 1)`,
-        strokeWidth: getOffsetStroke(type),
-        hide,
-      })));
+      taskPaths.push(...offsetPaths.map((offsetPath: Polygon[]) => {
+        const pathSegments = polygonsToSVGPaths(offsetPath, precision);
+        return pathSegments.map((pathSegment) => {
+          return ({
+            path: pathSegment,
+            fill: "none",
+            stroke: `rgba(${color}, 1)`,
+            strokeWidth: getOffsetStroke(type),
+            hide,
+          });
+        });
+      }).flat());
 
       const pathOffsetDuration = performance.now() - pathOffsetStart;
-      const totalDuration = polygonsToPathDuration + clipperOffsetDuration + pathOffsetDuration;
+      const totalDuration = polygonsToSVGPathsDuration + clipperOffsetDuration + pathOffsetDuration;
 
       timings.push(
         `Rendering ${type} polygons to paths took total ${totalDuration.toFixed(2)}ms:`,
-        `  Polygons to Path: ${polygonsToPathDuration.toFixed(2)}ms`,
+        `  Polygons to Path: ${polygonsToSVGPathsDuration.toFixed(2)}ms`,
         `  Clipper Offsets (${steps} steps): ${clipperOffsetDuration.toFixed(2)}ms`,
-        `  Paths Offset: ${pathOffsetDuration.toFixed(2)}ms`
+        `  Paths Offset SVG Paths: ${pathOffsetDuration.toFixed(2)}ms`
       );
 
       return taskPaths;

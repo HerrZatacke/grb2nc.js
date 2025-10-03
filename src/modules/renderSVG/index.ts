@@ -1,7 +1,7 @@
 import {Point, Polygon} from "@/types/geo";
 import {TaskType} from "@/types/tasks.ts";
 
-export const polygonsToPath = (polygons: Polygon[], precision: number): string => {
+export const polygonsToSVGPaths = (polygons: Polygon[], precision: number): string[] => {
   return polygons.reduce((path: string[], points: Point[]): string[] => {
     return [
       ...path,
@@ -17,8 +17,7 @@ export const polygonsToPath = (polygons: Polygon[], precision: number): string =
         return `${lm}${x.toFixed(2)} ${y.toFixed(2)}`;
       }).join(' '),
     ];
-  }, [])
-    .join(' ');
+  }, []);
 }
 
 
