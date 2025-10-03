@@ -80,6 +80,7 @@ export const useFileReader = (): UseFileReader => {
       fileName: taskFile.name,
       fileTime: taskFile.lastModified,
       fileContent: await taskFile.text(),
+      hide: false,
       type,
       flip,
     };

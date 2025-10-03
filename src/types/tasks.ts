@@ -10,4 +10,5 @@ export type Task = {
   fileContent: string;
   type: TaskType;
   flip: boolean;
+  hide: boolean;
 };

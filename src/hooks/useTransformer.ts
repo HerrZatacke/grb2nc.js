@@ -22,6 +22,7 @@ interface TaskProps {
   fill: string;
   stroke: string;
   strokeWidth: string;
+  hide: boolean;
 }
 
 export interface UseTransformer {
@@ -80,17 +81,18 @@ export const useTransformer = (): UseTransformer => {
       Math.round(h + (2 * svgViewBoxOffset)),
     ].join(' '));
 
-    const paths = transformedTasks.map(({ polygons, type, flip, steps, offset }): TaskProps[] => {
+    const paths = transformedTasks.map(({ polygons, type, flip, steps, offset, hide }): TaskProps[] => {
       const start = Date.now();
       const color = getColor(type, flip);
 
 
       // create filled shape
-      const taskPaths = [{
+      const taskPaths: TaskProps[] = [{
         path: polygonsToPath(polygons, precision),
         fill: `rgba(${color}, 0.1)`,
         stroke: `rgba(${color}, 0.6)`,
         strokeWidth: '0.5',
+        hide,
       }];
 
 
@@ -109,6 +111,7 @@ export const useTransformer = (): UseTransformer => {
         fill: "none",
         stroke: `rgba(${color}, 1)`,
         strokeWidth: getOffsetStroke(type),
+        hide,
       })));
 
       const duration = Date.now() - start;

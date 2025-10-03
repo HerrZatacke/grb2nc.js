@@ -14,15 +14,15 @@ export default function SVGPreview() {
         <TransformComponent>
           <svg className="svg-preview__svg" viewBox={viewBox}>
             {
-              paths.map(({ path, fill, stroke, strokeWidth }, index) => (
-                <path
+              paths.map(({ path, fill, stroke, strokeWidth, hide }, index) => (
+                !hide && (<path
                   fill={fill}
                   stroke={stroke}
                   strokeWidth={strokeWidth}
                   key={index}
                   d={path}
                 />
-              ))
+              )))
             }
           </svg>
         </TransformComponent>
