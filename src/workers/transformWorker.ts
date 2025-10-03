@@ -1,4 +1,4 @@
-import { expose } from 'comlink';
+import {expose} from 'comlink';
 import {Task, TaskProps, TaskType, TaskWithPolygons} from "@/types/tasks.ts";
 import {parse} from "@hpcreery/tracespace-parser";
 import {plot} from "@hpcreery/tracespace-plotter";
@@ -8,6 +8,11 @@ import {Clipper, type IntPoint, IntRect} from "clipper-lib";
 import {Polygon} from "@/types/geo";
 import {createOffset} from "@/modules/createOffset";
 
+export interface TransformWorkerParams {
+  tasks: Task[],
+  precision: number,
+}
+
 export interface TransformWorkerResult {
   paths: TaskProps[],
   bounds: IntRect,
@@ -15,10 +20,7 @@ export interface TransformWorkerResult {
 }
 
 export interface TansformWorkerApi {
-  calculate: (
-    tasks: Task[],
-    precision: number,
-  ) => Promise<TransformWorkerResult>
+  calculate: (params: TransformWorkerParams) => Promise<TransformWorkerResult>
 }
 
 const defaultBounds = (value: number): IntRect => ({
@@ -55,10 +57,9 @@ const filterPointsInsideBoard = (polygons: Polygon[], boardPolygons: Polygon[]):
 
 
 const api: TansformWorkerApi = {
-  async calculate(
-    tasks: Task[],
-    precision: number,
-  ): Promise<TransformWorkerResult> {
+  async calculate(params: TransformWorkerParams): Promise<TransformWorkerResult> {
+    const { tasks, precision } = params;
+
     if (!tasks.length) {
       return {
         paths: [],
