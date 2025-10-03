@@ -27,7 +27,9 @@ export const useTransformer = (): UseTransformer => {
     // setIsWorking(true);
 
     api.calculate(tasks, precision)
-      .then(({ bounds, paths }) => {
+      .then(({ bounds, paths, timings }) => {
+        console.log(timings.join('\n'));
+
         const x = bounds.left / precision;
         const y = bounds.top / precision;
         const w = (bounds.right - bounds.left) / precision;

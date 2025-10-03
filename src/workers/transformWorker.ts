@@ -11,6 +11,7 @@ import {createOffset} from "@/modules/createOffset";
 export interface TransformWorkerResult {
   paths: TaskProps[],
   bounds: IntRect,
+  timings: string[],
 }
 
 export interface TansformWorkerApi {
@@ -62,8 +63,11 @@ const api: TansformWorkerApi = {
       return {
         paths: [],
         bounds: defaultBounds(0),
+        timings: ['No tasks, nothing to do.'],
       };
     }
+
+    const timings: string[] = [];
 
     const transformedTasks = tasks.map((task): TaskWithPolygons => {
       const syntaxTree = parse(task.fileContent)
@@ -100,8 +104,9 @@ const api: TansformWorkerApi = {
     }
 
     const paths = transformedTasks.map(({ polygons, type, flip, steps, offset, hide }): TaskProps[] => {
-      // const start = Date.now();
       const color = getColor(type, flip);
+
+      const polygonsToPathStart = performance.now();
 
       // create filled shape
       const taskPaths: TaskProps[] = [{
@@ -112,8 +117,9 @@ const api: TansformWorkerApi = {
         hide,
       }];
 
+      const polygonsToPathDuration = performance.now() - polygonsToPathStart;
+      const clipperOffsetStart = performance.now();
 
-      // const clipperOffsetStart = Date.now();
       // create preview paths
       const offsetPaths = Array.from({ length: steps })
         .reduce((acc: Polygon[][]): Polygon[][] => {
@@ -125,7 +131,9 @@ const api: TansformWorkerApi = {
           (type !== TaskType.EDGE_CUT && boardEdgeOffset) ? filterPointsInsideBoard(offsetPaths, boardEdgeOffset) : offsetPaths
         ));
 
-      // const svgOffsetStart = Date.now();
+      const clipperOffsetDuration = performance.now() - clipperOffsetStart;
+      const pathOffsetStart = performance.now();
+
       taskPaths.push(...offsetPaths.map((offsetPath: Polygon[]) => ({
         path: polygonsToPath(offsetPath, precision),
         fill: "none",
@@ -134,10 +142,15 @@ const api: TansformWorkerApi = {
         hide,
       })));
 
-      // const duration = Date.now() - start;
-      // const clipperOffsetDuration = Date.now() - clipperOffsetStart;
-      // const svgOffsetDuration = Date.now() - svgOffsetStart;
-      // console.log(`Rendering ${type} polygons to svg paths took ${duration}ms\nClipper Offsets: ${clipperOffsetDuration}ms\nSVG Offsets: ${svgOffsetDuration}ms`);
+      const pathOffsetDuration = performance.now() - pathOffsetStart;
+      const totalDuration = polygonsToPathDuration + clipperOffsetDuration + pathOffsetDuration;
+
+      timings.push(
+        `Rendering ${type} polygons to paths took total ${totalDuration.toFixed(2)}ms:`,
+        `  Polygons to Path: ${polygonsToPathDuration.toFixed(2)}ms`,
+        `  Clipper Offsets (${steps} steps): ${clipperOffsetDuration.toFixed(2)}ms`,
+        `  Paths Offset: ${pathOffsetDuration.toFixed(2)}ms`
+      );
 
       return taskPaths;
     });
@@ -145,6 +158,7 @@ const api: TansformWorkerApi = {
     return {
       bounds: globalBounds,
       paths: paths.flat(),
+      timings,
     };
   }
 }
