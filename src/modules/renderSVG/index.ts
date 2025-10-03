@@ -5,10 +5,7 @@ export const polygonsToSVGPaths = (polygons: Polygon[], precision: number): stri
   return polygons.reduce((path: string[], points: Point[]): string[] => {
     return [
       ...path,
-      [
-        ...points,
-        points[0]
-      ].map((pt, index) => {
+      points.map((pt, index) => {
         const lm = index ? 'L' : 'M'
 
         const x = pt.X / precision;
