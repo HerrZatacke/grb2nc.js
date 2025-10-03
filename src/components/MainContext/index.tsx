@@ -8,12 +8,15 @@ interface MainContextValue {
   tasks: Task[];
   updateTask: (task: Task) => void;
   setTasks: (tasks: Task[]) => void;
+  busy: boolean,
+  setBusy: (busy: boolean) => void;
 }
 
 const mainContext = createContext<MainContextValue | null>(null);
 
 export function MainProvider({ children }: PropsWithChildren) {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [busy, setBusy] = useState<boolean>(false);
 
   const updateTask = useCallback((updateTask: Task) => {
     setTasks((currentTasks) => (
@@ -29,9 +32,11 @@ export function MainProvider({ children }: PropsWithChildren) {
 
   const contextValue: MainContextValue = useMemo(() => ({
     tasks,
-    updateTask,
     setTasks,
-  }), [tasks]);
+    busy,
+    setBusy,
+    updateTask,
+  }), [tasks, busy, updateTask]);
 
   return (
     <mainContext.Provider value={contextValue}>

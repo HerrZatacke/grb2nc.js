@@ -15,7 +15,7 @@ export interface UseTransformer {
 
 
 export const useTransformer = (): UseTransformer => {
-  const {tasks} = useMainContext();
+  const {tasks, setBusy} = useMainContext();
   const [paths, setPaths] = useState<TaskProps[]>([]);
   const [viewBox, setViewBox] = useState<string>('');
   const precision = transformer.getPrecision();
@@ -24,7 +24,7 @@ export const useTransformer = (): UseTransformer => {
     const worker = new Worker(new URL('@/workers/transformWorker', import.meta.url), { type: 'module' });
     const api = wrap<TansformWorkerApi>(worker);
 
-    // setIsWorking(true);
+    setBusy(true);
 
     api.calculate(tasks, precision)
       .then(({ bounds, paths, timings }) => {
@@ -42,9 +42,10 @@ export const useTransformer = (): UseTransformer => {
         ].join(' '));
 
         setPaths(paths);
+        setBusy(false);
       });
 
-  }, [tasks]);
+  }, [tasks, setBusy]);
 
   return {
     paths,
