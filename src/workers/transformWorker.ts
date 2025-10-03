@@ -7,6 +7,7 @@ import {getColor, getOffset, getOffsetStroke, getSteps, polygonsToSVGPaths} from
 import {Clipper, type IntPoint, IntRect} from "clipper-lib";
 import {Polygon} from "@/types/geo";
 import {createOffset} from "@/modules/createOffset";
+import {samePoint} from "@/modules/transformer/mergePolyline.ts";
 
 export interface TransformWorkerParams {
   tasks: Task[],
@@ -49,11 +50,54 @@ const isPointInsideBoard = (pt: IntPoint, boardPolygons: Polygon[]): boolean => 
   return insideOuter;
 }
 
-const filterPointsInsideBoard = (polygons: Polygon[], boardPolygons: Polygon[]): Polygon[] => {
-  return polygons.map(path =>
-    path.filter(pt => isPointInsideBoard(pt, boardPolygons))
-  ).filter(path => path.length > 0); // remove empty ones
+function closePath(path: Polygon): Polygon {
+  const firstPoint = path[0];
+  const lastPoint = path[path.length - 1]
+
+  if (samePoint(firstPoint, lastPoint)) {
+    return path;
+  }
+
+  return [
+    ...path,
+    firstPoint,
+  ]
 }
+
+const filterPointsInsideBoard = (
+  polygons: Polygon[],
+  boardPolygons: Polygon[]
+): Polygon[] => {
+  const newPolygons = polygons.map((path: Polygon): Polygon[] => {
+    const result: Polygon[] = [];
+    let current: Polygon = [];
+
+    for (const point of path) {
+      if (isPointInsideBoard(point, boardPolygons)) {
+        current.push(point);
+      } else {
+        // when a point is filtered, close the current polygon (if any)
+        if (current.length > 0) {
+          console.log(current, current[0], current[current.length-1]);
+          result.push(current);
+          current = [];
+        }
+      }
+    }
+
+    // push last collected segment
+    if (current.length > 0) {
+      result.push(current);
+    }
+
+    // if nothing valid, preserve as one empty polygon
+    return result.length > 0 ? result : [];
+  }).flat();
+
+  console.log(newPolygons);
+
+  return newPolygons;
+};
 
 
 const api: TansformWorkerApi = {
@@ -75,7 +119,7 @@ const api: TansformWorkerApi = {
       const imageTree = plot(syntaxTree);
       transformer.run(imageTree, task.type);
 
-      const polygons = transformer.result(task.type);
+      const polygons = transformer.result(task.type).map(closePath);
 
       return {
         ...task,
@@ -127,7 +171,7 @@ const api: TansformWorkerApi = {
       const offsetPaths = Array.from({ length: steps })
         .reduce((acc: Polygon[][]): Polygon[][] => {
           const next = createOffset(acc[acc.length - 1], offset);
-          return [...acc, next];
+          return [...acc, next.map(closePath)];
         }, [polygons])
         .slice(1)
         .map((offsetPaths) => (

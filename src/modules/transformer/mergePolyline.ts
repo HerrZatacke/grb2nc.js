@@ -1,6 +1,6 @@
-import type {Point, Polygon} from '../../types/geo';
+import type {Point, Polygon} from '@/types/geo';
 
-const samePoint = (p1: Point, p2: Point, eps = 1e-4): boolean => {
+export const samePoint = (p1: Point, p2: Point, eps = 1e-4): boolean => {
   return (
     Math.abs(p1.X - p2.X) < eps &&
     Math.abs(p1.Y - p2.Y) < eps
