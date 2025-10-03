@@ -26,7 +26,7 @@ class Transformer {
     this.clipper.Clear();
     this.edgePolygons = [];
 
-    const start = Date.now();
+    // const start = Date.now();
 
     plotData.children.forEach(child => {
       switch (child.type) {
@@ -58,8 +58,8 @@ class Transformer {
         });
     }
 
-    const duration = Date.now() - start;
-    console.log(`Transforming gerber to ${taskType} polygons took ${duration}ms`);
+    // const duration = Date.now() - start;
+    // console.log(`Transforming gerber to ${taskType} polygons took ${duration}ms`);
   }
 
   drawShape(shape: Shape /* , taskType: TaskType*/) {

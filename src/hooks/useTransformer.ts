@@ -82,7 +82,7 @@ export const useTransformer = (): UseTransformer => {
     ].join(' '));
 
     const paths = transformedTasks.map(({ polygons, type, flip, steps, offset, hide }): TaskProps[] => {
-      const start = Date.now();
+      // const start = Date.now();
       const color = getColor(type, flip);
 
 
@@ -96,7 +96,7 @@ export const useTransformer = (): UseTransformer => {
       }];
 
 
-      const clipperOffsetStart = Date.now();
+      // const clipperOffsetStart = Date.now();
       // create preview paths
       const offsetPaths = Array.from({ length: steps })
         .reduce((acc: Polygon[][]): Polygon[][] => {
@@ -105,7 +105,7 @@ export const useTransformer = (): UseTransformer => {
         }, [polygons])
         .slice(1);
 
-      const svgOffsetStart = Date.now();
+      // const svgOffsetStart = Date.now();
       taskPaths.push(...offsetPaths.map((offsetPath: Polygon[]) => ({
         path: polygonsToPath(offsetPath, precision),
         fill: "none",
@@ -114,10 +114,10 @@ export const useTransformer = (): UseTransformer => {
         hide,
       })));
 
-      const duration = Date.now() - start;
-      const clipperOffsetDuration = Date.now() - clipperOffsetStart;
-      const svgOffsetDuration = Date.now() - svgOffsetStart;
-      console.log(`Rendering ${type} polygons to svg paths took ${duration}ms\nClipper Offsets: ${clipperOffsetDuration}ms\nSVG Offsets: ${svgOffsetDuration}ms`);
+      // const duration = Date.now() - start;
+      // const clipperOffsetDuration = Date.now() - clipperOffsetStart;
+      // const svgOffsetDuration = Date.now() - svgOffsetStart;
+      // console.log(`Rendering ${type} polygons to svg paths took ${duration}ms\nClipper Offsets: ${clipperOffsetDuration}ms\nSVG Offsets: ${svgOffsetDuration}ms`);
 
       return taskPaths;
     });

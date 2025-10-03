@@ -99,7 +99,6 @@ export const useFileReader = (): UseFileReader => {
         .filter(Boolean) as Task[];
 
       if (!tasksAreEqual(tasks, newTasks)) {
-        console.log('relaODING tasks', tasks, newTasks);
         setTasks(newTasks);
       }
     };
