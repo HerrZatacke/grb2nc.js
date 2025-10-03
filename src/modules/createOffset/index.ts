@@ -6,8 +6,7 @@ export const createOffset = (polygons: Polygon[], offsetDistance: number): Polyg
   const offsetPaths: Polygon[] = [];
 
   polygons.forEach((path) => {
-    // if (!Clipper.Orientation(path)) { //flip? }
-    clipperOffset.AddPath(path, JoinType.jtMiter, EndType.etClosedPolygon);
+    clipperOffset.AddPath(path, JoinType.jtRound, EndType.etClosedPolygon);
   });
 
   const offsetPath: Polygon[] = [];
