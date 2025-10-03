@@ -27,6 +27,7 @@ declare module 'clipper-lib' {
     static CleanPolygon(...args: any[]): any;
     static GetBounds(...args: any[]): IntRect;
     static Orientation(...args: any[]): boolean;
+    static PointInPolygon(...args: any[]): number;
     static ioReverseSolution: 1;
     static ioStrictlySimple: 2;
     static ioPreserveCollinear: 4;

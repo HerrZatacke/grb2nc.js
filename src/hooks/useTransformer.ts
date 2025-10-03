@@ -1,11 +1,11 @@
 import {useEffect, useState} from "react";
-import {Clipper, type IntRect} from "clipper-lib";
+import {Clipper, type IntPoint, type IntRect} from "clipper-lib";
 import {useMainContext} from "@/components/MainContext";
 import {parse} from "@hpcreery/tracespace-parser";
 import {plot} from "@hpcreery/tracespace-plotter";
 import {transformer} from "@/modules/transformer";
 import {Polygon} from "@/types/geo";
-import {Task} from "@/types/tasks.ts";
+import {Task, TaskType} from "@/types/tasks.ts";
 import {getColor, getOffset, getOffsetStroke, getSteps, polygonsToPath} from "@/modules/render";
 import {createOffset} from "@/modules/createOffset";
 
@@ -29,6 +29,31 @@ export interface UseTransformer {
   paths: TaskProps[];
   viewBox: string;
   precision: number;
+}
+
+const isPointInsideBoard = (pt: IntPoint, boardPolygons: Polygon[]): boolean => {
+  let insideOuter = false;
+
+  for (const poly of boardPolygons) {
+    const orientation = Clipper.Orientation(poly); // true = clockwise
+    const res = Clipper.PointInPolygon(pt, poly);
+
+    if (res !== 0) {
+      if (orientation) {
+        insideOuter = true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  return insideOuter;
+}
+
+const filterPointsInsideBoard = (polygons: Polygon[], boardPolygons: Polygon[]): Polygon[] => {
+  return polygons.map(path =>
+    path.filter(pt => isPointInsideBoard(pt, boardPolygons))
+  ).filter(path => path.length > 0); // remove empty ones
 }
 
 export const useTransformer = (): UseTransformer => {
@@ -55,20 +80,29 @@ export const useTransformer = (): UseTransformer => {
       }
     });
 
-    const globalBounds: IntRect = transformedTasks.reduce((acc: IntRect, { polygons }): IntRect => {
-      const bounds = Clipper.GetBounds(polygons);
-      return {
-        bottom: Math.max(acc.bottom, bounds.bottom),
-        left: Math.min(acc.left, bounds.left),
-        right: Math.max(acc.right, bounds.right),
-        top: Math.min(acc.top, bounds.top),
-      };
-    }, {
-      bottom: -Infinity,
-      left: Infinity,
-      right: -Infinity,
-      top: Infinity,
-    });
+    const boardEdge = transformedTasks.find(({ type }) => (type === TaskType.EDGE_CUT));
+    const boardEdgeOffset = boardEdge?.polygons;
+
+    let globalBounds: IntRect;
+
+    if (boardEdge) {
+      globalBounds = Clipper.GetBounds(boardEdge.polygons);
+    } else {
+      globalBounds = transformedTasks.reduce((acc: IntRect, { polygons }): IntRect => {
+        const bounds = Clipper.GetBounds(polygons);
+        return {
+          bottom: Math.max(acc.bottom, bounds.bottom),
+          left: Math.min(acc.left, bounds.left),
+          right: Math.max(acc.right, bounds.right),
+          top: Math.min(acc.top, bounds.top),
+        };
+      }, {
+        bottom: -Infinity,
+        left: Infinity,
+        right: -Infinity,
+        top: Infinity,
+      })
+    }
 
     const x = globalBounds.left / precision;
     const y = globalBounds.top / precision;
@@ -85,12 +119,11 @@ export const useTransformer = (): UseTransformer => {
       // const start = Date.now();
       const color = getColor(type, flip);
 
-
       // create filled shape
       const taskPaths: TaskProps[] = [{
         path: polygonsToPath(polygons, precision),
-        fill: `rgba(${color}, 0.1)`,
-        stroke: `rgba(${color}, 0.6)`,
+        fill: `rgba(${color}, 0.025)`,
+        stroke: `rgba(${color}, 0.33)`,
         strokeWidth: '0.5',
         hide,
       }];
@@ -103,7 +136,10 @@ export const useTransformer = (): UseTransformer => {
           const next = createOffset(acc[acc.length - 1], offset);
           return [...acc, next];
         }, [polygons])
-        .slice(1);
+        .slice(1)
+        .map((offsetPaths) => (
+          (type !== TaskType.EDGE_CUT && boardEdgeOffset) ? filterPointsInsideBoard(offsetPaths, boardEdgeOffset) : offsetPaths
+        ));
 
       // const svgOffsetStart = Date.now();
       taskPaths.push(...offsetPaths.map((offsetPath: Polygon[]) => ({
