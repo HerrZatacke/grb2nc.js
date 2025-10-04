@@ -71,7 +71,7 @@ const filterPointsInsideBoard = (
   polygons: Polygon[],
   boardPolygons: Polygon[]
 ): Polygon[] => {
-  const newPolygons = polygons.map((path: Polygon): Polygon[] => {
+  return polygons.map((path: Polygon): Polygon[] => {
     const result: Polygon[] = [];
     let current: Polygon = [];
 
@@ -95,8 +95,6 @@ const filterPointsInsideBoard = (
     // if nothing valid, preserve as one empty polygon
     return result.length > 0 ? result : [];
   }).flat();
-
-  return newPolygons;
 };
 
 
