@@ -8,6 +8,7 @@ import {Clipper, type IntPoint, IntRect} from "clipper-lib";
 import {Polygon} from "@/types/geo";
 import {createOffset} from "@/modules/createOffset";
 import {samePoint} from "@/modules/transformer/mergePolyline.ts";
+import {hash as ohash} from "ohash";
 
 export interface TransformWorkerParams {
   tasks: Task[],
@@ -23,6 +24,8 @@ export interface TransformWorkerResult {
 export interface TansformWorkerApi {
   calculate: (params: TransformWorkerParams) => Promise<TransformWorkerResult>
 }
+
+const resultMap: Map<string, TransformWorkerResult> = new Map([]);
 
 const defaultBounds = (value: number): IntRect => ({
   bottom: -value,
@@ -78,7 +81,6 @@ const filterPointsInsideBoard = (
       } else {
         // when a point is filtered, close the current polygon (if any)
         if (current.length > 0) {
-          console.log(current, current[0], current[current.length-1]);
           result.push(current);
           current = [];
         }
@@ -94,8 +96,6 @@ const filterPointsInsideBoard = (
     return result.length > 0 ? result : [];
   }).flat();
 
-  console.log(newPolygons);
-
   return newPolygons;
 };
 
@@ -110,6 +110,12 @@ const api: TansformWorkerApi = {
         bounds: defaultBounds(0),
         timings: ['No tasks, nothing to do.'],
       };
+    }
+
+    const parameterHash = ohash(params);
+
+    if (resultMap.has(parameterHash)) {
+      return resultMap.get(parameterHash) as TransformWorkerResult;
     }
 
     const timings: string[] = [];
@@ -152,7 +158,6 @@ const api: TansformWorkerApi = {
       const color = getColor(type, flip);
 
       const polygonsToSVGPathsStart = performance.now();
-
 
       const svgPaths = polygonsToSVGPaths(polygons, precision);
 
@@ -207,11 +212,15 @@ const api: TansformWorkerApi = {
       return taskPaths;
     });
 
-    return {
+    const result = {
       bounds: globalBounds,
       paths: paths.flat(),
       timings,
     };
+
+    resultMap.set(parameterHash, result)
+
+    return result;
   }
 }
 
