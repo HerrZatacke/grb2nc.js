@@ -97,6 +97,35 @@ const filterPointsInsideBoard = (
   }).flat();
 };
 
+interface CreateOffsetPathsParams {
+  offsetSteps: number;
+  offsetDistance: number;
+  initialPath: Polygon[],
+  taskType: TaskType,
+  boardEdgeOffset?: Polygon[],
+}
+
+const createOffsetPaths = (params: CreateOffsetPathsParams): Polygon[][] => {
+  const {
+    offsetSteps,
+    offsetDistance,
+    initialPath,
+    taskType,
+    boardEdgeOffset,
+  } = params;
+
+  const offsetPaths: Polygon[][] = Array.from({ length: offsetSteps })
+    .reduce((acc: Polygon[][], _, index: number): Polygon[][] => {
+      const next = createOffset(acc[acc.length - 1], offsetDistance).map(closePath);
+      // the first path (index===0) is the original shape without offset, which get's dropped.
+      return (index === 0) ? [next] : [...acc, next];
+    }, [initialPath])
+    .map((offsetPaths) => (
+      (taskType !== TaskType.EDGE_CUT && boardEdgeOffset) ? filterPointsInsideBoard(offsetPaths, boardEdgeOffset) : offsetPaths
+    ));
+
+  return offsetPaths;
+}
 
 const api: TansformWorkerApi = {
   async calculate(params: TransformWorkerParams): Promise<TransformWorkerResult> {
@@ -170,16 +199,14 @@ const api: TansformWorkerApi = {
       const polygonsToSVGPathsDuration = performance.now() - polygonsToSVGPathsStart;
       const clipperOffsetStart = performance.now();
 
-      // create preview paths
-      const offsetPaths = Array.from({ length: steps })
-        .reduce((acc: Polygon[][]): Polygon[][] => {
-          const next = createOffset(acc[acc.length - 1], offset);
-          return [...acc, next.map(closePath)];
-        }, [polygons])
-        .slice(1)
-        .map((offsetPaths) => (
-          (type !== TaskType.EDGE_CUT && boardEdgeOffset) ? filterPointsInsideBoard(offsetPaths, boardEdgeOffset) : offsetPaths
-        ));
+      // create offset paths
+      const offsetPaths: Polygon[][] = createOffsetPaths({
+        boardEdgeOffset,
+        initialPath: polygons,
+        offsetDistance: offset,
+        offsetSteps: steps,
+        taskType: type
+      });
 
       const clipperOffsetDuration = performance.now() - clipperOffsetStart;
       const pathOffsetStart = performance.now();
