@@ -26,6 +26,7 @@ export interface TansformWorkerApi {
 }
 
 const resultMap: Map<string, TransformWorkerResult> = new Map([]);
+const offsetPathsMap: Map<string, Polygon[][]> = new Map([]);
 
 const defaultBounds = (value: number): IntRect => ({
   bottom: -value,
@@ -114,15 +115,23 @@ const createOffsetPaths = (params: CreateOffsetPathsParams): Polygon[][] => {
     boardEdgeOffset,
   } = params;
 
+  const parameterHash = ohash(params);
+
+  if (offsetPathsMap.has(parameterHash)) {
+    return offsetPathsMap.get(parameterHash) as Polygon[][];
+  }
+
   const offsetPaths: Polygon[][] = Array.from({ length: offsetSteps })
     .reduce((acc: Polygon[][], _, index: number): Polygon[][] => {
       const next = createOffset(acc[acc.length - 1], offsetDistance).map(closePath);
-      // the first path (index===0) is the original shape without offset, which get's dropped.
+      // the first path (index===0) is the original shape without offset, which gets dropped.
       return (index === 0) ? [next] : [...acc, next];
     }, [initialPath])
     .map((offsetPaths) => (
       (taskType !== TaskType.EDGE_CUT && boardEdgeOffset) ? filterPointsInsideBoard(offsetPaths, boardEdgeOffset) : offsetPaths
     ));
+
+  offsetPathsMap.set(parameterHash, offsetPaths)
 
   return offsetPaths;
 }
@@ -243,7 +252,7 @@ const api: TansformWorkerApi = {
       timings,
     };
 
-    resultMap.set(parameterHash, result)
+    resultMap.set(parameterHash, result);
 
     return result;
   }
