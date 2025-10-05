@@ -21,13 +21,13 @@ declare module 'clipper-lib' {
     constructor(init?: number);
     AddPath(polygon: Polygon, polyType: PolyType, closed: boolean): void;
     AddPaths(polygons: Polygon[], polyType: PolyType, closed: boolean): void;
-    Execute(clipType: ClipType, solutionTarget: Polygon[], subjFillType: PolyFillType, clipFillType: PolyFillType): any;
+    Execute(clipType: ClipType, solutionTarget: Polygon[], subjFillType: PolyFillType, clipFillType: PolyFillType): boolean;
     Clear(): void;
 
-    static CleanPolygon(...args: any[]): any;
-    static GetBounds(...args: any[]): IntRect;
-    static Orientation(...args: any[]): boolean;
-    static PointInPolygon(...args: any[]): number;
+    static CleanPolygon(polygon: Polygon, distance?: number): Polygon;
+    static GetBounds(polygons: Polygon[]): IntRect;
+    static Orientation(polygon: Polygon): boolean;
+    static PointInPolygon(point: IntPoint, polygon: Polygon): number; // -1, 0, or 1 (inside/on/outside)
     static ioReverseSolution: 1;
     static ioStrictlySimple: 2;
     static ioPreserveCollinear: 4;

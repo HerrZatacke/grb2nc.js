@@ -1,12 +1,12 @@
-import {Point, Polygon} from '@/types/geo';
-import {TaskType} from '@/types/tasks.ts';
+import { Point, Polygon } from '@/types/geo';
+import { TaskType } from '@/types/tasks.ts';
 
 export const polygonsToSVGPaths = (polygons: Polygon[], precision: number): string[] => {
   return polygons.reduce((path: string[], points: Point[]): string[] => {
     return [
       ...path,
       points.map((pt, index) => {
-        const lm = index ? 'L' : 'M'
+        const lm = index ? 'L' : 'M';
 
         const x = pt.X / precision;
         const y = pt.Y / precision;
@@ -15,7 +15,7 @@ export const polygonsToSVGPaths = (polygons: Polygon[], precision: number): stri
       }).join(' '),
     ];
   }, []);
-}
+};
 
 
 export const getColor = (taskType: TaskType, flip: boolean): string => {
@@ -28,7 +28,7 @@ export const getColor = (taskType: TaskType, flip: boolean): string => {
   }
 
   return flip ? '0,64,255' : '255,64,0';
-}
+};
 
 export const getSteps = (type: TaskType): number => {
   switch (type) {
@@ -39,26 +39,26 @@ export const getSteps = (type: TaskType): number => {
     case TaskType.DRILL:
       return 0;
   }
-}
+};
 
 export const getOffset = (type: TaskType): number => {
   switch (type) {
     case TaskType.EDGE_CUT:
       return 60000;
     case TaskType.ISOLATION:
-      return 5000
+      return 5000;
     default:
       return 0;
   }
-}
+};
 
 export const getOffsetStroke = (type: TaskType): string => {
   switch (type) {
     case TaskType.EDGE_CUT:
       return '4';
     case TaskType.ISOLATION:
-      return '1'
+      return '1';
     default:
       return 'none';
   }
-}
+};

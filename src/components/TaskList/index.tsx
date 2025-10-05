@@ -1,7 +1,7 @@
 'use client';
 
-import {useMainContext} from '@/components/MainContext';
-import {useDownloadNC} from '@/hooks/useDownloadNC.ts';
+import { useMainContext } from '@/components/MainContext';
+import { useDownloadNC } from '@/hooks/useDownloadNC.ts';
 import './styles.scss';
 
 export default function TaskList() {

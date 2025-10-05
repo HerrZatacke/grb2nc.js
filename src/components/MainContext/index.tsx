@@ -1,8 +1,8 @@
 'use client';
 
-import {PropsWithChildren, useCallback, useState, createContext, useContext, useMemo} from 'react';
-import {Task, RenderedTask} from '@/types/tasks.ts';
-import {useTransformer} from "@/hooks/useTransformer.ts";
+import { PropsWithChildren, useCallback, useState, createContext, useContext, useMemo } from 'react';
+import { useTransformer } from '@/hooks/useTransformer.ts';
+import { Task, RenderedTask } from '@/types/tasks.ts';
 
 interface MainContextValue {
   tasks: Task[];
@@ -22,16 +22,16 @@ export function MainProvider({ children }: PropsWithChildren) {
   const [renderedTasks, setRenderedTasks] = useState<RenderedTask[]>([]);
   const [viewBox, setViewBox] = useState<string>('');
 
-  const updateTask = useCallback((updateTask: Task) => {
+  const updateTask = useCallback((updatedTask: Task) => {
     setTasks((currentTasks) => (
-      currentTasks.map((task: Task) => {
-        if (task.fileName !== updateTask.fileName) {
-          return task;
+      currentTasks.map((currentTask: Task) => {
+        if (currentTask.fileName !== updatedTask.fileName) {
+          return currentTask;
         }
 
-        return updateTask;
+        return updatedTask;
       })
-    ))
+    ));
   }, []);
 
   useTransformer({ tasks, setBusy, setRenderedTasks, setViewBox });

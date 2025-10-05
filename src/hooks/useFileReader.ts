@@ -1,6 +1,6 @@
-import {Task, TaskType} from '@/types/tasks.ts';
-import {useMainContext} from '@/components/MainContext';
-import {useCallback, type ChangeEvent, useState, useEffect} from 'react';
+import { useCallback, type ChangeEvent, useState, useEffect } from 'react';
+import { useMainContext } from '@/components/MainContext';
+import { Task, TaskType } from '@/types/tasks.ts';
 
 export interface UseFileReader {
   canUseFilePicker: boolean;
@@ -20,15 +20,15 @@ const tasksAreEqual = (arr1: Task[], arr2: Task[]): boolean => {
 
   if (set1.size !== set2.size) return false;
 
-  for (let val of set1) {
+  for (const val of set1) {
     if (!set2.has(val)) return false;
   }
 
   return true;
-}
+};
 
 export const useFileReader = (): UseFileReader => {
-  const {tasks, setTasks} = useMainContext();
+  const { tasks, setTasks } = useMainContext();
   const [fileHandles, setFileHandles] = useState<FileSystemFileHandle[]>();
   const [canUseFilePicker, setCanUseFilePicker] = useState(false);
 
@@ -80,7 +80,8 @@ export const useFileReader = (): UseFileReader => {
       fileName: taskFile.name,
       fileTime: taskFile.lastModified,
       fileContent: await taskFile.text(),
-      hide: false,
+      hidePaths: false,
+      hideAreas: false,
       type,
       flip,
     };
@@ -94,7 +95,7 @@ export const useFileReader = (): UseFileReader => {
         fileHandles.map(async (handle): Promise<Task | null> => {
           const file = await handle.getFile();
           return createTaskFromFile(file);
-        })
+        }),
       ))
         .filter(Boolean) as Task[];
 
@@ -107,19 +108,19 @@ export const useFileReader = (): UseFileReader => {
     updateHandles();
 
     return () => window.clearInterval(intervalHandle);
-  }, [fileHandles, tasks])
+  }, [createTaskFromFile, fileHandles, setTasks, tasks]);
 
   const onFileInputChange = useCallback(async (ev: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const input = ev.currentTarget;
     if (!input.files?.length) { throw new Error('can not read files'); }
-    const tasks: (Task | null)[] = await Promise.all([...input.files].map(createTaskFromFile));
+    const newTasks: (Task | null)[] = await Promise.all([...input.files].map(createTaskFromFile));
     input.value = '';
-    setTasks(tasks.filter(Boolean) as Task[]);
-  }, [setTasks]);
+    setTasks(newTasks.filter(Boolean) as Task[]);
+  }, [createTaskFromFile, setTasks]);
 
   return {
     canUseFilePicker,
     onFileInputChange,
     requestInputHandle,
   };
-}
+};

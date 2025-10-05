@@ -1,14 +1,14 @@
-import {expose} from 'comlink';
-import {RenderedTask, SVGPathProps, Task, TaskType, TaskWithPolygons} from '@/types/tasks.ts';
-import {parse} from '@hpcreery/tracespace-parser';
-import {plot} from '@hpcreery/tracespace-plotter';
-import {transformer} from '@/modules/transformer';
-import {getColor, getOffset, getOffsetStroke, getSteps, polygonsToSVGPaths} from '@/modules/renderSVG';
-import {Clipper, type IntPoint, IntRect} from 'clipper-lib';
-import {Polygon} from '@/types/geo';
-import {createOffset} from '@/modules/createOffset';
-import {samePoint} from '@/modules/transformer/mergePolyline.ts';
-import {hash as ohash} from 'ohash';
+import { parse } from '@hpcreery/tracespace-parser';
+import { plot } from '@hpcreery/tracespace-plotter';
+import { Clipper, type IntPoint, IntRect } from 'clipper-lib';
+import { expose } from 'comlink';
+import { hash as ohash } from 'ohash';
+import { createOffset } from '@/modules/createOffset';
+import { getColor, getOffset, getOffsetStroke, getSteps, polygonsToSVGPaths } from '@/modules/renderSVG';
+import { transformer } from '@/modules/transformer';
+import { samePoint } from '@/modules/transformer/mergePolyline.ts';
+import { Polygon } from '@/types/geo';
+import { RenderedTask, SVGPathProps, Task, TaskType, TaskWithPolygons } from '@/types/tasks.ts';
 
 export interface TransformWorkerParams {
   tasks: Task[],
@@ -52,11 +52,11 @@ const isPointInsideBoard = (pt: IntPoint, boardPolygons: Polygon[]): boolean => 
   }
 
   return insideOuter;
-}
+};
 
 function closePath(path: Polygon): Polygon {
   const firstPoint = path[0];
-  const lastPoint = path[path.length - 1]
+  const lastPoint = path[path.length - 1];
 
   if (samePoint(firstPoint, lastPoint)) {
     return path;
@@ -65,12 +65,12 @@ function closePath(path: Polygon): Polygon {
   return [
     ...path,
     firstPoint,
-  ]
+  ];
 }
 
 const filterPointsInsideBoard = (
   polygons: Polygon[],
-  boardPolygons: Polygon[]
+  boardPolygons: Polygon[],
 ): Polygon[] => {
   return polygons.map((path: Polygon): Polygon[] => {
     const result: Polygon[] = [];
@@ -127,14 +127,14 @@ const createOffsetPaths = (params: CreateOffsetPathsParams): Polygon[][] => {
       // the first path (index===0) is the original shape without offset, which gets dropped.
       return (index === 0) ? [next] : [...acc, next];
     }, [initialPath])
-    .map((offsetPaths) => (
-      (taskType !== TaskType.EDGE_CUT && boardEdgeOffset) ? filterPointsInsideBoard(offsetPaths, boardEdgeOffset) : offsetPaths
+    .map((mapOffsetPaths) => (
+      (taskType !== TaskType.EDGE_CUT && boardEdgeOffset) ? filterPointsInsideBoard(mapOffsetPaths, boardEdgeOffset) : mapOffsetPaths
     ));
 
-  offsetPathsMap.set(parameterHash, offsetPaths)
+  offsetPathsMap.set(parameterHash, offsetPaths);
 
   return offsetPaths;
-}
+};
 
 const api: TansformWorkerApi = {
   async calculate(params: TransformWorkerParams): Promise<TransformWorkerResult> {
@@ -157,7 +157,7 @@ const api: TansformWorkerApi = {
     const timings: string[] = [];
 
     const transformedTasks = tasks.map((task): TaskWithPolygons => {
-      const syntaxTree = parse(task.fileContent)
+      const syntaxTree = parse(task.fileContent);
       const imageTree = plot(syntaxTree);
       transformer.run(imageTree, task.type);
 
@@ -167,8 +167,8 @@ const api: TansformWorkerApi = {
         ...task,
         polygons,
         steps: getSteps(task.type),
-        offset: getOffset(task.type)
-      }
+        offset: getOffset(task.type),
+      };
     });
 
     const boardEdge = transformedTasks.find(({ type }) => (type === TaskType.EDGE_CUT));
@@ -187,7 +187,7 @@ const api: TansformWorkerApi = {
           right: Math.max(acc.right, bounds.right),
           top: Math.min(acc.top, bounds.top),
         };
-      }, defaultBounds(Infinity))
+      }, defaultBounds(Infinity));
     }
 
     const renderedTasks = transformedTasks.map((taskWithPolygons: TaskWithPolygons): RenderedTask => {
@@ -224,7 +224,7 @@ const api: TansformWorkerApi = {
         initialPath: polygons,
         offsetDistance: offset,
         offsetSteps: steps,
-        taskType: type
+        taskType: type,
       });
 
       const clipperOffsetDuration = performance.now() - clipperOffsetStart;
@@ -250,7 +250,7 @@ const api: TansformWorkerApi = {
         `Rendering ${type} polygons to paths took total ${totalDuration.toFixed(2)}ms:`,
         `  Polygons to Path: ${polygonsToSVGPathsDuration.toFixed(2)}ms`,
         `  Clipper Offsets (${steps} steps): ${clipperOffsetDuration.toFixed(2)}ms`,
-        `  Paths Offset SVG Paths: ${pathOffsetDuration.toFixed(2)}ms`
+        `  Paths Offset SVG Paths: ${pathOffsetDuration.toFixed(2)}ms`,
       );
 
       return {
@@ -269,7 +269,7 @@ const api: TansformWorkerApi = {
     resultMap.set(parameterHash, result);
 
     return result;
-  }
-}
+  },
+};
 
 expose(api);

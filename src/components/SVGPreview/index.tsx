@@ -1,6 +1,6 @@
 'use client';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import {useMainContext} from '@/components/MainContext';
+import { useMainContext } from '@/components/MainContext';
 import './styles.scss';
 
 export default function SVGPreview() {

@@ -1,6 +1,6 @@
 import FileInput from '@/components/FileInput';
-import TaskList from '@/components/TaskList';
 import SVGPreview from '@/components/SVGPreview';
+import TaskList from '@/components/TaskList';
 
 export default function Home() {
   return (

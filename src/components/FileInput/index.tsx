@@ -1,9 +1,9 @@
 'use client';
 
-import {useMemo} from 'react';
 import clsx from 'clsx';
-import {useFileReader} from '@/hooks/useFileReader.ts';
-import {useMainContext} from '@/components/MainContext';
+import { useMemo } from 'react';
+import { useMainContext } from '@/components/MainContext';
+import { useFileReader } from '@/hooks/useFileReader.ts';
 import './styles.scss';
 
 

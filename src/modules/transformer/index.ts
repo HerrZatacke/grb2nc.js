@@ -1,8 +1,8 @@
-import {type ImagePath, type ImageRegion, type ImageTree, type Shape,} from '@hpcreery/tracespace-plotter';
-import {Clipper, PolyType, ClipType, PolyFillType} from 'clipper-lib';
-import {mergePolyline} from './mergePolyline';
-import {Point, type Polygon} from '@/types/geo';
-import {TaskType} from '@/types/tasks.ts';
+import { type ImagePath, type ImageRegion, type ImageTree, type Shape } from '@hpcreery/tracespace-plotter';
+import { Clipper, PolyType, ClipType, PolyFillType } from 'clipper-lib';
+import { Point, type Polygon } from '@/types/geo';
+import { TaskType } from '@/types/tasks.ts';
+import { mergePolyline } from './mergePolyline';
 
 const PI = Math.PI;
 const PI_2 = Math.PI / 2;
@@ -47,7 +47,7 @@ class Transformer {
           break;
 
         default:
-          console.error(`not implemented type`);
+          console.error('not implemented type');
       }
     });
 
@@ -111,7 +111,7 @@ class Transformer {
             polygon.push({ X, Y });
           });
 
-          polygon.push({...polygon[0]});
+          polygon.push({ ...polygon[0] });
 
           if (polygon.length > 2) {
             this.addPolygon(polygon, false);
@@ -155,7 +155,7 @@ class Transformer {
               const startArc = this.createArc(
                 x1, y1, arcRadius,
                 angle + PI_2,
-                angle - PI_2 + PI2
+                angle - PI_2 + PI2,
               );
 
               const endArc = this.createArc(
@@ -167,8 +167,8 @@ class Transformer {
               const polygon: Polygon = [
                 ...startArc,
                 ...endArc,
-                startArc[0]
-              ].map(pt => ({X: pt.X, Y: pt.Y}));
+                startArc[0],
+              ].map(pt => ({ X: pt.X, Y: pt.Y }));
 
               this.addPolygon(polygon, false);
               break;
@@ -225,7 +225,7 @@ class Transformer {
       polygon.push({ X: segment.end[0], Y: segment.end[1] });
     });
 
-    polygon.push(polygon[0])
+    polygon.push(polygon[0]);
 
     if (polygon.length > 2) {
       this.addPolygon(polygon, false);
@@ -276,7 +276,7 @@ class Transformer {
 
   result(taskType: TaskType): Polygon[] {
     const traceSolution: Polygon[] = [];
-    const pft: PolyFillType = taskType === TaskType.EDGE_CUT ? PolyFillType.pftEvenOdd : PolyFillType.pftNonZero
+    const pft: PolyFillType = taskType === TaskType.EDGE_CUT ? PolyFillType.pftEvenOdd : PolyFillType.pftNonZero;
     // const pft: PolyFillType = PolyFillType.pftEvenOdd;
     // const pft: PolyFillType = PolyFillType.pftNonZero;
 

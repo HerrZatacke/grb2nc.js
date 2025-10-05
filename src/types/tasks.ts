@@ -1,4 +1,4 @@
-import {Polygon} from '@/types/geo';
+import { Polygon } from '@/types/geo';
 
 export enum TaskType {
   ISOLATION = 'isolation',

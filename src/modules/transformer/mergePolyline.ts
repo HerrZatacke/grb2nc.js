@@ -1,11 +1,11 @@
-import type {Point, Polygon} from '@/types/geo';
+import type { Point, Polygon } from '@/types/geo';
 
 export const samePoint = (p1: Point, p2: Point, eps = 1e-4): boolean => {
   return (
     Math.abs(p1.X - p2.X) < eps &&
     Math.abs(p1.Y - p2.Y) < eps
   );
-}
+};
 
 export const mergePolyline = (segments: Polygon[]): Polygon[] => {
   if (segments.length === 0) return [];
@@ -75,4 +75,4 @@ export const mergePolyline = (segments: Polygon[]): Polygon[] => {
   }
 
   return result;
-}
+};

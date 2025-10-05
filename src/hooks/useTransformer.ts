@@ -1,8 +1,8 @@
-import {useEffect, useRef} from 'react';
-import {Remote, wrap} from 'comlink';
-import {transformer} from '@/modules/transformer';
-import {Task, RenderedTask} from '@/types/tasks.ts';
-import type {TansformWorkerApi, TransformWorkerParams, TransformWorkerResult} from '@/workers/transformWorker';
+import { Remote, wrap } from 'comlink';
+import { useEffect, useRef } from 'react';
+import { transformer } from '@/modules/transformer';
+import { Task, RenderedTask } from '@/types/tasks.ts';
+import type { TansformWorkerApi, TransformWorkerParams, TransformWorkerResult } from '@/workers/transformWorker';
 
 const svgViewBoxOffset = 75;
 
@@ -17,8 +17,8 @@ interface UseTransformerParams {
   setViewBox: (viewBox: string) => void;
 }
 
-export const useTransformer = (params: UseTransformerParams) => {
-  const {tasks, setBusy, setRenderedTasks, setViewBox} = params;
+export const useTransformer = (useTransformerParams: UseTransformerParams) => {
+  const { tasks, setBusy, setRenderedTasks, setViewBox } = useTransformerParams;
   const workerApi = useRef<Remote<TansformWorkerApi> | null>(null);
 
   const precision = transformer.getPrecision();
@@ -67,5 +67,5 @@ export const useTransformer = (params: UseTransformerParams) => {
       .catch((error) => {
         console.error(error);
       });
-  }, [tasks, setBusy]);
-}
+  }, [tasks, setBusy, precision, setViewBox, setRenderedTasks]);
+};
