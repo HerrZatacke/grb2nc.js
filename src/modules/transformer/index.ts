@@ -1,8 +1,8 @@
-import {type ImagePath, type ImageRegion, type ImageTree, type Shape,} from "@hpcreery/tracespace-plotter";
+import {type ImagePath, type ImageRegion, type ImageTree, type Shape,} from '@hpcreery/tracespace-plotter';
 import {Clipper, PolyType, ClipType, PolyFillType} from 'clipper-lib';
-import {mergePolyline} from "./mergePolyline";
+import {mergePolyline} from './mergePolyline';
 import {Point, type Polygon} from '@/types/geo';
-import {TaskType} from "@/types/tasks.ts";
+import {TaskType} from '@/types/tasks.ts';
 
 const PI = Math.PI;
 const PI_2 = Math.PI / 2;

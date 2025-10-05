@@ -1,9 +1,9 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useRef, useState} from 'react';
 import {Remote, wrap} from 'comlink';
-import {useMainContext} from "@/components/MainContext";
-import {transformer} from "@/modules/transformer";
-import {TaskProps} from "@/types/tasks.ts";
-import type {TansformWorkerApi, TransformWorkerParams, TransformWorkerResult} from "@/workers/transformWorker";
+import {useMainContext} from '@/components/MainContext';
+import {transformer} from '@/modules/transformer';
+import {TaskProps} from '@/types/tasks.ts';
+import type {TansformWorkerApi, TransformWorkerParams, TransformWorkerResult} from '@/workers/transformWorker';
 
 const svgViewBoxOffset = 75;
 

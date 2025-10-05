@@ -1,14 +1,14 @@
 import {expose} from 'comlink';
-import {Task, TaskProps, TaskType, TaskWithPolygons} from "@/types/tasks.ts";
-import {parse} from "@hpcreery/tracespace-parser";
-import {plot} from "@hpcreery/tracespace-plotter";
-import {transformer} from "@/modules/transformer";
-import {getColor, getOffset, getOffsetStroke, getSteps, polygonsToSVGPaths} from "@/modules/renderSVG";
-import {Clipper, type IntPoint, IntRect} from "clipper-lib";
-import {Polygon} from "@/types/geo";
-import {createOffset} from "@/modules/createOffset";
-import {samePoint} from "@/modules/transformer/mergePolyline.ts";
-import {hash as ohash} from "ohash";
+import {Task, TaskProps, TaskType, TaskWithPolygons} from '@/types/tasks.ts';
+import {parse} from '@hpcreery/tracespace-parser';
+import {plot} from '@hpcreery/tracespace-plotter';
+import {transformer} from '@/modules/transformer';
+import {getColor, getOffset, getOffsetStroke, getSteps, polygonsToSVGPaths} from '@/modules/renderSVG';
+import {Clipper, type IntPoint, IntRect} from 'clipper-lib';
+import {Polygon} from '@/types/geo';
+import {createOffset} from '@/modules/createOffset';
+import {samePoint} from '@/modules/transformer/mergePolyline.ts';
+import {hash as ohash} from 'ohash';
 
 export interface TransformWorkerParams {
   tasks: Task[],
@@ -225,7 +225,7 @@ const api: TansformWorkerApi = {
         return pathSegments.map((pathSegment) => {
           return ({
             path: pathSegment,
-            fill: "none",
+            fill: 'none',
             stroke: `rgba(${color}, 1)`,
             strokeWidth: getOffsetStroke(type),
             hide,

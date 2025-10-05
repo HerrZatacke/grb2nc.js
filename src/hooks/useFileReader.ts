@@ -1,6 +1,6 @@
-import {Task, TaskType} from "@/types/tasks.ts";
-import {useMainContext} from "@/components/MainContext";
-import {useCallback, type ChangeEvent, useState, useEffect} from "react";
+import {Task, TaskType} from '@/types/tasks.ts';
+import {useMainContext} from '@/components/MainContext';
+import {useCallback, type ChangeEvent, useState, useEffect} from 'react';
 
 export interface UseFileReader {
   canUseFilePicker: boolean;

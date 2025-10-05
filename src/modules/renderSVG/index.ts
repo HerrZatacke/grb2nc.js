@@ -1,5 +1,5 @@
-import {Point, Polygon} from "@/types/geo";
-import {TaskType} from "@/types/tasks.ts";
+import {Point, Polygon} from '@/types/geo';
+import {TaskType} from '@/types/tasks.ts';
 
 export const polygonsToSVGPaths = (polygons: Polygon[], precision: number): string[] => {
   return polygons.reduce((path: string[], points: Point[]): string[] => {

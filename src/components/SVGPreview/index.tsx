@@ -1,6 +1,6 @@
 'use client';
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import {useTransformer} from "@/hooks/useTransformer.ts";
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import {useTransformer} from '@/hooks/useTransformer.ts';
 import './styles.scss';
 
 export default function SVGPreview() {

@@ -2,7 +2,7 @@
 
 import {PropsWithChildren, useCallback, useState} from 'react';
 import { createContext, useContext, useMemo } from 'react';
-import {Task} from "@/types/tasks.ts";
+import {Task} from '@/types/tasks.ts';
 
 interface MainContextValue {
   tasks: Task[];

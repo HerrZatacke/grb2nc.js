@@ -1,10 +1,10 @@
 'use client';
 
-import {useMemo} from "react";
+import {useMemo} from 'react';
 import clsx from 'clsx';
-import {useFileReader} from "@/hooks/useFileReader.ts";
+import {useFileReader} from '@/hooks/useFileReader.ts';
+import {useMainContext} from '@/components/MainContext';
 import './styles.scss';
-import {useMainContext} from "@/components/MainContext";
 
 
 export default function FileInput() {

@@ -1,5 +1,5 @@
-import {Polygon} from "@/types/geo";
-import {ClipperOffset, EndType, JoinType} from "clipper-lib";
+import {Polygon} from '@/types/geo';
+import {ClipperOffset, EndType, JoinType} from 'clipper-lib';
 
 export const createOffset = (polygons: Polygon[], offsetDistance: number): Polygon[] => {
   const clipperOffset = new ClipperOffset();

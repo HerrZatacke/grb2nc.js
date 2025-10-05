@@ -1,6 +1,6 @@
 'use client';
 
-import {useMainContext} from "@/components/MainContext";
+import {useMainContext} from '@/components/MainContext';
 import './styles.scss';
 
 export default function TaskList() {
