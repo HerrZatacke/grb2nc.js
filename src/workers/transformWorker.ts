@@ -207,13 +207,13 @@ const api: TansformWorkerApi = {
 
       const svgPaths = polygonsToSVGPaths(polygons, precision);
 
-      const svgPathProps: SVGPathProps[] = svgPaths.map((path): SVGPathProps => ({
-        path,
+      const svgPathProps: SVGPathProps[] = [{
+        path: svgPaths.join('\n'),
         fill: `rgba(${color}, 0.025)`,
         stroke: `rgba(${color}, 0.33)`,
         strokeWidth: '0.5',
         hide: hideAreas,
-      }));
+      }];
 
       const polygonsToSVGPathsDuration = performance.now() - polygonsToSVGPathsStart;
       const clipperOffsetStart = performance.now();
