@@ -1,18 +1,18 @@
-import { parse } from '@hpcreery/tracespace-parser';
+import { parse, UNITS, Units as UnitsNode } from '@hpcreery/tracespace-parser';
 import { plot } from '@hpcreery/tracespace-plotter';
 import { Clipper, type IntPoint, IntRect } from 'clipper-lib';
 import { expose } from 'comlink';
 import { hash as ohash } from 'ohash';
 import { createOffset } from '@/modules/createOffset';
-import { getColor, getOffset, getOffsetStroke, getSteps, polygonsToSVGPaths } from '@/modules/renderSVG';
+import { getAreaStroke, getColor, getOffsetStroke, polygonsToSVGPaths } from '@/modules/renderSVG';
 import { transformer } from '@/modules/transformer';
 import { samePoint } from '@/modules/transformer/mergePolyline.ts';
 import { Polygon } from '@/types/geo';
-import { RenderedTask, SVGPathProps, Task, TaskType, TaskWithPolygons } from '@/types/tasks.ts';
+import { RenderedTask, SVGPathProps, Task, TaskType, TaskWithPolygons, Units } from '@/types/tasks.ts';
 
 export interface TransformWorkerParams {
   tasks: Task[],
-  precision: number,
+  scale: number,
 }
 
 export interface TransformWorkerResult {
@@ -115,6 +115,8 @@ const createOffsetPaths = (params: CreateOffsetPathsParams): Polygon[][] => {
     boardEdgeOffset,
   } = params;
 
+  const scale = transformer.getScale();
+
   const parameterHash = ohash(params);
 
   if (offsetPathsMap.has(parameterHash)) {
@@ -123,7 +125,7 @@ const createOffsetPaths = (params: CreateOffsetPathsParams): Polygon[][] => {
 
   const offsetPaths: Polygon[][] = Array.from({ length: offsetSteps })
     .reduce((acc: Polygon[][], _, index: number): Polygon[][] => {
-      const next = createOffset(acc[acc.length - 1], offsetDistance).map(closePath);
+      const next = createOffset(acc[acc.length - 1], offsetDistance * scale).map(closePath);
       // the first path (index===0) is the original shape without offset, which gets dropped.
       return (index === 0) ? [next] : [...acc, next];
     }, [initialPath])
@@ -138,7 +140,7 @@ const createOffsetPaths = (params: CreateOffsetPathsParams): Polygon[][] => {
 
 const api: TansformWorkerApi = {
   async calculate(params: TransformWorkerParams): Promise<TransformWorkerResult> {
-    const { tasks, precision } = params;
+    const { tasks, scale } = params;
 
     if (!tasks.length) {
       return {
@@ -158,6 +160,10 @@ const api: TansformWorkerApi = {
 
     const transformedTasks = tasks.map((task): TaskWithPolygons => {
       const syntaxTree = parse(task.fileContent);
+
+      const unitsNode = syntaxTree.children.find(({ type }) => (type === UNITS)) as (UnitsNode | undefined);
+      const units = unitsNode && unitsNode.units === 'in' ? Units.INCHES : Units.MILLIMETERS;
+
       const imageTree = plot(syntaxTree);
       transformer.run(imageTree, task.type);
 
@@ -166,8 +172,7 @@ const api: TansformWorkerApi = {
       return {
         ...task,
         polygons,
-        steps: getSteps(task.type),
-        offset: getOffset(task.type),
+        units,
       };
     });
 
@@ -205,13 +210,13 @@ const api: TansformWorkerApi = {
 
       const polygonsToSVGPathsStart = performance.now();
 
-      const svgPaths = polygonsToSVGPaths(polygons, precision);
+      const svgPaths = polygonsToSVGPaths(polygons, scale);
 
       const svgPathProps: SVGPathProps[] = [{
         path: svgPaths.join('\n'),
         fill: `rgba(${color}, 0.025)`,
         stroke: `rgba(${color}, 0.33)`,
-        strokeWidth: '0.5',
+        strokeWidth: getAreaStroke(),
         hide: hideAreas,
       }];
 
@@ -231,7 +236,7 @@ const api: TansformWorkerApi = {
       const pathOffsetStart = performance.now();
 
       svgPathProps.push(...offsetPaths.map((offsetPath: Polygon[]) => {
-        const pathSegments = polygonsToSVGPaths(offsetPath, precision);
+        const pathSegments = polygonsToSVGPaths(offsetPath, scale);
         return pathSegments.map((pathSegment): SVGPathProps => {
           return {
             path: pathSegment,

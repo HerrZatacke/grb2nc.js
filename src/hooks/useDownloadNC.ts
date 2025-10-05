@@ -1,5 +1,6 @@
 import { saveAs } from 'file-saver';
 import { useCallback } from 'react';
+import { transformer } from '@/modules/transformer';
 import { Polygon } from '@/types/geo';
 import { RenderedTask } from '@/types/tasks.ts';
 
@@ -86,9 +87,9 @@ export const useDownloadNC = (): UseDownloadNC => {
     // console.log(task.offsetPaths.flat(1));
     const gCode = generateGCode({
       contours: task.offsetPaths.flat(1),
-      scale: 10000,
-      zPasses: 3,
-      zStep: 1.5,
+      scale: transformer.getScale(),
+      zPasses: 1,
+      zStep: 0,
       safeHeight: 2,
       feedZ: 200,
       feedXY: 800,

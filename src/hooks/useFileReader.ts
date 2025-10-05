@@ -8,6 +8,30 @@ export interface UseFileReader {
   requestInputHandle: () => void;
 }
 
+export const getSteps = (type: TaskType): number => {
+  switch (type) {
+    case TaskType.EDGE_CUT:
+      return 1;
+    case TaskType.ISOLATION:
+      return 4;
+    case TaskType.DRILL:
+      return 0;
+  }
+};
+
+export const getOffset = (type: TaskType): number => {
+  switch (type) {
+    case TaskType.EDGE_CUT:
+      return 1;
+    case TaskType.ISOLATION:
+      return 0.1;
+    case TaskType.DRILL:
+    default:
+      return 0;
+  }
+};
+
+
 const extensions: `.${string}`[] = ['.gbr', '.drl'];
 
 const tasksAreEqual = (arr1: Task[], arr2: Task[]): boolean => {
@@ -82,6 +106,8 @@ export const useFileReader = (): UseFileReader => {
       fileContent: await taskFile.text(),
       hidePaths: false,
       hideAreas: false,
+      steps: getSteps(type),
+      offset: getOffset(type),
       type,
       flip,
     };

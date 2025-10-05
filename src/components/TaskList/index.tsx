@@ -3,6 +3,20 @@
 import { useMainContext } from '@/components/MainContext';
 import { useDownloadNC } from '@/hooks/useDownloadNC.ts';
 import './styles.scss';
+import { TaskType } from '@/types/tasks.ts';
+
+const typeIcon = (type: TaskType): string => {
+  switch (type) {
+    case TaskType.DRILL:
+      return '🕳️';
+    case TaskType.EDGE_CUT:
+      return '🔪';
+    case TaskType.ISOLATION:
+      return '〰';
+    default:
+      return '';
+  }
+};
 
 export default function TaskList() {
   const { renderedTasks, updateTask } = useMainContext();
@@ -12,7 +26,7 @@ export default function TaskList() {
   return (
     <div className="task-list">
       {renderedTasks.map((task) => {
-        const { fileName, type } = task;
+        const { fileName, type, steps, offset, units } = task;
         return (
           <span
             key={fileName}
@@ -55,8 +69,14 @@ export default function TaskList() {
               </span>
             </button>
             <span>
-              {fileName}: {type}
+              {typeIcon(type)}
             </span>
+            <span>
+              {fileName}
+            </span>
+            <code>
+              {`${steps} steps each ${offset}${units}`}
+            </code>
           </span>
         );
       })}

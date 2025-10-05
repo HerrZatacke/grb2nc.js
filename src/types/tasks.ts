@@ -6,6 +6,11 @@ export enum TaskType {
   DRILL = 'drill',
 }
 
+export enum Units {
+  MILLIMETERS = 'mm',
+  INCHES = 'in',
+}
+
 export type Task = {
   fileName: string;
   fileTime: number;
@@ -14,12 +19,13 @@ export type Task = {
   flip: boolean;
   hidePaths: boolean;
   hideAreas: boolean;
+  steps: number;
+  offset: number;
 };
 
 export interface TaskWithPolygons extends Task {
   polygons: Polygon[];
-  steps: number;
-  offset: number;
+  units: Units;
 }
 
 export interface SVGPathProps {

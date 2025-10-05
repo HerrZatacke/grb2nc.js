@@ -1,14 +1,9 @@
 import { Remote, wrap } from 'comlink';
 import { useEffect, useRef } from 'react';
+import { getViewBox } from '@/modules/renderSVG';
 import { transformer } from '@/modules/transformer';
 import { Task, RenderedTask } from '@/types/tasks.ts';
 import type { TansformWorkerApi, TransformWorkerParams, TransformWorkerResult } from '@/workers/transformWorker';
-
-const svgViewBoxOffset = 75;
-
-// export interface UseTransformer {
-//   precision: number;
-// }
 
 interface UseTransformerParams {
   tasks: Task[];
@@ -21,7 +16,7 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
   const { tasks, setBusy, setRenderedTasks, setViewBox } = useTransformerParams;
   const workerApi = useRef<Remote<TansformWorkerApi> | null>(null);
 
-  const precision = transformer.getPrecision();
+  const scale = transformer.getScale();
 
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -37,18 +32,7 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
 
     const handleResult = ({ bounds, renderedTasks, timings }: TransformWorkerResult) => {
       console.info(timings.join('\n'));
-
-      const x = bounds.left / precision;
-      const y = bounds.top / precision;
-      const w = (bounds.right - bounds.left) / precision;
-      const h = (bounds.bottom - bounds.top) / precision;
-      setViewBox([
-        Math.round(x -svgViewBoxOffset),
-        Math.round(y -svgViewBoxOffset),
-        Math.round(w + (2 * svgViewBoxOffset)),
-        Math.round(h + (2 * svgViewBoxOffset)),
-      ].join(' '));
-
+      setViewBox(getViewBox(bounds));
       setRenderedTasks(renderedTasks);
       setBusy(false);
     };
@@ -57,7 +41,7 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
 
     const params: TransformWorkerParams = {
       tasks,
-      precision,
+      scale,
     };
 
     workerApi.current.calculate(params)
@@ -67,5 +51,5 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
       .catch((error) => {
         console.error(error);
       });
-  }, [tasks, setBusy, precision, setViewBox, setRenderedTasks]);
+  }, [tasks, setBusy, scale, setViewBox, setRenderedTasks]);
 };

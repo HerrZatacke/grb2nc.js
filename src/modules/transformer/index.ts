@@ -15,9 +15,9 @@ class Transformer {
   private edgePolygons: Polygon[] = [];
   private scale = 0;
   private minimumRadius = 0;
-  private precision = 1000;
+  private precision = 10000;
 
-  constructor(scale: number, minimumRadius: number) {
+  constructor(minimumRadius: number, scale = 1) {
     this.scale = scale * this.precision;
     this.minimumRadius = minimumRadius;
   }
@@ -290,9 +290,9 @@ class Transformer {
     return traceSolution;
   }
 
-  getPrecision(): number {
-    return this.precision;
+  getScale(): number {
+    return this.scale;
   }
 }
 
-export const transformer = new Transformer(60, 0.05);
+export const transformer = new Transformer(0.05);
