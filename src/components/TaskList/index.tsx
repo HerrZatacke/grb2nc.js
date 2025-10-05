@@ -19,7 +19,7 @@ const typeIcon = (type: TaskType): string => {
 };
 
 export default function TaskList() {
-  const { renderedTasks, updateTask } = useMainContext();
+  const { renderedTasks, updateTask, busy } = useMainContext();
   const { downloadNCCode } = useDownloadNC();
   if (!renderedTasks.length) { return null; }
 
@@ -34,6 +34,7 @@ export default function TaskList() {
           >
             <button
               className="task-list__button"
+              disabled={busy}
               onClick={() => {
                 updateTask({
                   ...task,
@@ -47,6 +48,7 @@ export default function TaskList() {
             </button>
             <button
               className="task-list__button"
+              disabled={busy}
               onClick={() => {
                 updateTask({
                   ...task,
@@ -60,6 +62,7 @@ export default function TaskList() {
             </button>
             <button
               className="task-list__button"
+              disabled={busy}
               onClick={() => {
                 downloadNCCode(task);
               }}
@@ -74,9 +77,76 @@ export default function TaskList() {
             <span>
               {fileName}
             </span>
-            <code>
-              {`${steps} steps each ${offset}${units}`}
-            </code>
+            {type === TaskType.ISOLATION && (
+              <>
+                <code>
+                  {`${steps.toFixed(0)} steps`}
+                </code>
+                <button
+                  className="task-list__button"
+                  disabled={busy}
+                  onClick={() => {
+                    updateTask({
+                      ...task,
+                      steps: Math.max(0, task.steps - 1),
+                    });
+                  }}
+                >
+                  <span>
+                  -
+                  </span>
+                </button>
+                <button
+                  className="task-list__button"
+                  disabled={busy}
+                  onClick={() => {
+                    updateTask({
+                      ...task,
+                      steps: Math.min(10, task.steps + 1),
+                    });
+                  }}
+                >
+                  <span>
+                  +
+                  </span>
+                </button>
+              </>
+            )}
+            {type !== TaskType.DRILL && (
+              <>
+                <code>
+                  {`offset ${offset.toFixed(2)}${units}`}
+                </code>
+                <button
+                  className="task-list__button"
+                  disabled={busy}
+                  onClick={() => {
+                    updateTask({
+                      ...task,
+                      offset: Math.max(0, task.offset - 0.05),
+                    });
+                  }}
+                >
+                  <span>
+                  -
+                  </span>
+                </button>
+                <button
+                  className="task-list__button"
+                  disabled={busy}
+                  onClick={() => {
+                    updateTask({
+                      ...task,
+                      offset: Math.min(2, task.offset + 0.05),
+                    });
+                  }}
+                >
+                  <span>
+                  +
+                  </span>
+                </button>
+              </>
+            )}
           </span>
         );
       })}

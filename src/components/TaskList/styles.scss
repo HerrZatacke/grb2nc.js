@@ -22,7 +22,12 @@
     padding: 8px;
     border-radius: 3px;
 
-    &:hover {
+    &:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    &:not(:disabled):hover {
       background: #eeeeee;
     }
   }

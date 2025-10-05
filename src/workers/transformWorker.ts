@@ -123,15 +123,21 @@ const createOffsetPaths = (params: CreateOffsetPathsParams): Polygon[][] => {
     return offsetPathsMap.get(parameterHash) as Polygon[][];
   }
 
-  const offsetPaths: Polygon[][] = Array.from({ length: offsetSteps })
-    .reduce((acc: Polygon[][], _, index: number): Polygon[][] => {
-      const next = createOffset(acc[acc.length - 1], offsetDistance * scale).map(closePath);
-      // the first path (index===0) is the original shape without offset, which gets dropped.
-      return (index === 0) ? [next] : [...acc, next];
-    }, [initialPath])
-    .map((mapOffsetPaths) => (
-      (taskType !== TaskType.EDGE_CUT && boardEdgeOffset) ? filterPointsInsideBoard(mapOffsetPaths, boardEdgeOffset) : mapOffsetPaths
-    ));
+  const offsetPaths: Polygon[][] = [];
+
+  if (offsetSteps) {
+    const numSteps = offsetDistance ? offsetSteps : 1;
+    offsetPaths.push(...Array.from({ length: numSteps })
+      .reduce((acc: Polygon[][], _, index: number): Polygon[][] => {
+        const next = createOffset(acc[acc.length - 1], offsetDistance * scale).map(closePath);
+        // the first path (index===0) is the original shape without offset, which gets dropped.
+        return (index === 0) ? [next] : [...acc, next];
+      }, [initialPath])
+      .map((mapOffsetPaths) => (
+        (taskType !== TaskType.EDGE_CUT && boardEdgeOffset) ? filterPointsInsideBoard(mapOffsetPaths, boardEdgeOffset) : mapOffsetPaths
+      )),
+    );
+  }
 
   offsetPathsMap.set(parameterHash, offsetPaths);
 
