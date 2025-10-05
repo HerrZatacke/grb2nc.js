@@ -1,15 +1,17 @@
 'use client';
 
 import {useMainContext} from '@/components/MainContext';
+import {useDownloadNC} from '@/hooks/useDownloadNC.ts';
 import './styles.scss';
 
 export default function TaskList() {
-  const { tasks, updateTask } = useMainContext();
-  if (!tasks.length) { return null; }
+  const { renderedTasks, updateTask } = useMainContext();
+  const { downloadNCCode } = useDownloadNC();
+  if (!renderedTasks.length) { return null; }
 
   return (
     <div className="task-list">
-      {tasks.map((task) => {
+      {renderedTasks.map((task) => {
         const { fileName, type } = task;
         return (
           <span
@@ -40,6 +42,16 @@ export default function TaskList() {
             >
               <span>
               {task.hidePaths ? '✖️' : '👁️'}
+              </span>
+            </button>
+            <button
+              className="task-list__button"
+              onClick={() => {
+                downloadNCCode(task);
+              }}
+            >
+              <span>
+              💾
               </span>
             </button>
             <span>

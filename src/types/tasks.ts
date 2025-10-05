@@ -22,10 +22,15 @@ export interface TaskWithPolygons extends Task {
   offset: number;
 }
 
-export interface TaskProps {
+export interface SVGPathProps {
   path: string;
   fill: string;
   stroke: string;
   strokeWidth: string;
   hide: boolean;
+}
+
+export interface RenderedTask extends TaskWithPolygons {
+  svgPathProps: SVGPathProps[];
+  offsetPaths: Polygon[][];
 }

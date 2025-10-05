@@ -1,8 +1,8 @@
 'use client';
 
-import {PropsWithChildren, useCallback, useState} from 'react';
-import { createContext, useContext, useMemo } from 'react';
-import {Task} from '@/types/tasks.ts';
+import {PropsWithChildren, useCallback, useState, createContext, useContext, useMemo} from 'react';
+import {Task, RenderedTask} from '@/types/tasks.ts';
+import {useTransformer} from "@/hooks/useTransformer.ts";
 
 interface MainContextValue {
   tasks: Task[];
@@ -10,6 +10,8 @@ interface MainContextValue {
   setTasks: (tasks: Task[]) => void;
   busy: boolean,
   setBusy: (busy: boolean) => void;
+  renderedTasks: RenderedTask[];
+  viewBox: string;
 }
 
 const mainContext = createContext<MainContextValue | null>(null);
@@ -17,6 +19,8 @@ const mainContext = createContext<MainContextValue | null>(null);
 export function MainProvider({ children }: PropsWithChildren) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [busy, setBusy] = useState<boolean>(false);
+  const [renderedTasks, setRenderedTasks] = useState<RenderedTask[]>([]);
+  const [viewBox, setViewBox] = useState<string>('');
 
   const updateTask = useCallback((updateTask: Task) => {
     setTasks((currentTasks) => (
@@ -30,13 +34,17 @@ export function MainProvider({ children }: PropsWithChildren) {
     ))
   }, []);
 
+  useTransformer({ tasks, setBusy, setRenderedTasks, setViewBox });
+
   const contextValue: MainContextValue = useMemo(() => ({
-    tasks,
     setTasks,
-    busy,
     setBusy,
+    tasks,
+    busy,
     updateTask,
-  }), [tasks, busy, updateTask]);
+    renderedTasks,
+    viewBox,
+  }), [tasks, busy, updateTask, renderedTasks, viewBox]);
 
   return (
     <mainContext.Provider value={contextValue}>

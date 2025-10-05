@@ -1,5 +1,5 @@
 import {expose} from 'comlink';
-import {Task, TaskProps, TaskType, TaskWithPolygons} from '@/types/tasks.ts';
+import {RenderedTask, SVGPathProps, Task, TaskType, TaskWithPolygons} from '@/types/tasks.ts';
 import {parse} from '@hpcreery/tracespace-parser';
 import {plot} from '@hpcreery/tracespace-plotter';
 import {transformer} from '@/modules/transformer';
@@ -16,7 +16,7 @@ export interface TransformWorkerParams {
 }
 
 export interface TransformWorkerResult {
-  paths: TaskProps[],
+  renderedTasks: RenderedTask[],
   bounds: IntRect,
   timings: string[],
 }
@@ -142,7 +142,7 @@ const api: TansformWorkerApi = {
 
     if (!tasks.length) {
       return {
-        paths: [],
+        renderedTasks: [],
         bounds: defaultBounds(0),
         timings: ['No tasks, nothing to do.'],
       };
@@ -190,15 +190,25 @@ const api: TansformWorkerApi = {
       }, defaultBounds(Infinity))
     }
 
-    const paths = transformedTasks.map(({ polygons, type, flip, steps, offset, hidePaths, hideAreas }): TaskProps[] => {
+    const renderedTasks = transformedTasks.map((taskWithPolygons: TaskWithPolygons): RenderedTask => {
+      const {
+        polygons,
+        type,
+        flip,
+        steps,
+        offset,
+        hidePaths,
+        hideAreas,
+      } = taskWithPolygons;
+
       const color = getColor(type, flip);
 
       const polygonsToSVGPathsStart = performance.now();
 
       const svgPaths = polygonsToSVGPaths(polygons, precision);
 
-      const taskPaths: TaskProps[] = svgPaths.map((SVGpath): TaskProps => ({
-        path: SVGpath,
+      const svgPathProps: SVGPathProps[] = svgPaths.map((path): SVGPathProps => ({
+        path,
         fill: `rgba(${color}, 0.025)`,
         stroke: `rgba(${color}, 0.33)`,
         strokeWidth: '0.5',
@@ -220,16 +230,16 @@ const api: TansformWorkerApi = {
       const clipperOffsetDuration = performance.now() - clipperOffsetStart;
       const pathOffsetStart = performance.now();
 
-      taskPaths.push(...offsetPaths.map((offsetPath: Polygon[]) => {
+      svgPathProps.push(...offsetPaths.map((offsetPath: Polygon[]) => {
         const pathSegments = polygonsToSVGPaths(offsetPath, precision);
-        return pathSegments.map((pathSegment): TaskProps => {
-          return ({
+        return pathSegments.map((pathSegment): SVGPathProps => {
+          return {
             path: pathSegment,
             fill: 'none',
             stroke: `rgba(${color}, 1)`,
             strokeWidth: getOffsetStroke(type),
             hide: hidePaths,
-          });
+          };
         });
       }).flat());
 
@@ -243,12 +253,16 @@ const api: TansformWorkerApi = {
         `  Paths Offset SVG Paths: ${pathOffsetDuration.toFixed(2)}ms`
       );
 
-      return taskPaths;
+      return {
+        ...taskWithPolygons,
+        svgPathProps,
+        offsetPaths,
+      };
     });
 
-    const result = {
+    const result: TransformWorkerResult = {
       bounds: globalBounds,
-      paths: paths.flat(),
+      renderedTasks,
       timings,
     };
 

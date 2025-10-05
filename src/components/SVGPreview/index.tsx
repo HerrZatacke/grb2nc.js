@@ -1,12 +1,11 @@
 'use client';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import {useTransformer} from '@/hooks/useTransformer.ts';
+import {useMainContext} from '@/components/MainContext';
 import './styles.scss';
 
 export default function SVGPreview() {
-  const { paths, viewBox } = useTransformer();
-
-  if (!paths.length) { return null; }
+  const { renderedTasks, viewBox } = useMainContext();
+  if (!renderedTasks.length) { return null; }
 
   return (
     <div className="svg-preview">
@@ -14,15 +13,23 @@ export default function SVGPreview() {
         <TransformComponent>
           <svg className="svg-preview__svg" viewBox={viewBox}>
             {
-              paths.map(({ path, fill, stroke, strokeWidth, hide }, index) => (
-                !hide && (<path
-                  fill={fill}
-                  stroke={stroke}
-                  strokeWidth={strokeWidth}
-                  key={index}
-                  d={path}
-                />
-              )))
+              renderedTasks.map(({ svgPathProps }, taskIndex) => {
+                return (
+                  <g key={`g-${taskIndex}`}>
+                    {svgPathProps.map(({ path, fill, stroke, strokeWidth, hide }, pathIndex) => {
+                      return (
+                        !hide && (<path
+                            fill={fill}
+                            stroke={stroke}
+                            strokeWidth={strokeWidth}
+                            key={`p-${taskIndex}-${pathIndex}`}
+                            d={path}
+                          />
+                        ));
+                    })}
+                  </g>
+                );
+              })
             }
           </svg>
         </TransformComponent>

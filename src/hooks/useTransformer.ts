@@ -1,23 +1,26 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef} from 'react';
 import {Remote, wrap} from 'comlink';
-import {useMainContext} from '@/components/MainContext';
 import {transformer} from '@/modules/transformer';
-import {TaskProps} from '@/types/tasks.ts';
+import {Task, RenderedTask} from '@/types/tasks.ts';
 import type {TansformWorkerApi, TransformWorkerParams, TransformWorkerResult} from '@/workers/transformWorker';
 
 const svgViewBoxOffset = 75;
 
-export interface UseTransformer {
-  paths: TaskProps[];
-  viewBox: string;
-  precision: number;
+// export interface UseTransformer {
+//   precision: number;
+// }
+
+interface UseTransformerParams {
+  tasks: Task[];
+  setBusy: (busy: boolean) => void;
+  setRenderedTasks: (renderedTasks: RenderedTask[]) => void;
+  setViewBox: (viewBox: string) => void;
 }
 
-export const useTransformer = (): UseTransformer => {
-  const {tasks, setBusy} = useMainContext();
+export const useTransformer = (params: UseTransformerParams) => {
+  const {tasks, setBusy, setRenderedTasks, setViewBox} = params;
   const workerApi = useRef<Remote<TansformWorkerApi> | null>(null);
-  const [paths, setPaths] = useState<TaskProps[]>([]);
-  const [viewBox, setViewBox] = useState<string>('');
+
   const precision = transformer.getPrecision();
 
   useEffect(() => {
@@ -27,12 +30,12 @@ export const useTransformer = (): UseTransformer => {
     }, 1);
 
     return () => clearTimeout(handle);
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (!workerApi.current || !tasks.length) { return; }
 
-    const handleResult = ({ bounds, paths, timings }: TransformWorkerResult) => {
+    const handleResult = ({ bounds, renderedTasks, timings }: TransformWorkerResult) => {
       console.info(timings.join('\n'));
 
       const x = bounds.left / precision;
@@ -46,7 +49,7 @@ export const useTransformer = (): UseTransformer => {
         Math.round(h + (2 * svgViewBoxOffset)),
       ].join(' '));
 
-      setPaths(paths);
+      setRenderedTasks(renderedTasks);
       setBusy(false);
     };
 
@@ -65,10 +68,4 @@ export const useTransformer = (): UseTransformer => {
         console.error(error);
       });
   }, [tasks, setBusy]);
-
-  return {
-    paths,
-    viewBox,
-    precision,
-  };
 }
