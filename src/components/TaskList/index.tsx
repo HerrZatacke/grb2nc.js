@@ -12,23 +12,40 @@ export default function TaskList() {
       {tasks.map((task) => {
         const { fileName, type } = task;
         return (
-          <button
+          <span
             key={fileName}
             className="task-list__entry"
-            onClick={() => {
-              updateTask({
-                ...task,
-                hide: !task.hide,
-              });
-            }}
           >
-            <span>
-            {task.hide ? '✖️' : '👁️'}
-            </span>
+            <button
+              className="task-list__button"
+              onClick={() => {
+                updateTask({
+                  ...task,
+                  hideAreas: !task.hideAreas,
+                });
+              }}
+            >
+              <span>
+              {task.hideAreas ? '✖️' : '👁️'}
+              </span>
+            </button>
+            <button
+              className="task-list__button"
+              onClick={() => {
+                updateTask({
+                  ...task,
+                  hidePaths: !task.hidePaths,
+                });
+              }}
+            >
+              <span>
+              {task.hidePaths ? '✖️' : '👁️'}
+              </span>
+            </button>
             <span>
               {fileName}: {type}
             </span>
-          </button>
+          </span>
         );
       })}
     </div>

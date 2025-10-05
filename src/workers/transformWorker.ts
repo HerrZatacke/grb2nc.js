@@ -190,19 +190,19 @@ const api: TansformWorkerApi = {
       }, defaultBounds(Infinity))
     }
 
-    const paths = transformedTasks.map(({ polygons, type, flip, steps, offset, hide }): TaskProps[] => {
+    const paths = transformedTasks.map(({ polygons, type, flip, steps, offset, hidePaths, hideAreas }): TaskProps[] => {
       const color = getColor(type, flip);
 
       const polygonsToSVGPathsStart = performance.now();
 
       const svgPaths = polygonsToSVGPaths(polygons, precision);
 
-      const taskPaths: TaskProps[] = svgPaths.map((SVGpath) => ({
+      const taskPaths: TaskProps[] = svgPaths.map((SVGpath): TaskProps => ({
         path: SVGpath,
         fill: `rgba(${color}, 0.025)`,
         stroke: `rgba(${color}, 0.33)`,
         strokeWidth: '0.5',
-        hide,
+        hide: hideAreas,
       }));
 
       const polygonsToSVGPathsDuration = performance.now() - polygonsToSVGPathsStart;
@@ -222,13 +222,13 @@ const api: TansformWorkerApi = {
 
       taskPaths.push(...offsetPaths.map((offsetPath: Polygon[]) => {
         const pathSegments = polygonsToSVGPaths(offsetPath, precision);
-        return pathSegments.map((pathSegment) => {
+        return pathSegments.map((pathSegment): TaskProps => {
           return ({
             path: pathSegment,
             fill: 'none',
             stroke: `rgba(${color}, 1)`,
             strokeWidth: getOffsetStroke(type),
-            hide,
+            hide: hidePaths,
           });
         });
       }).flat());

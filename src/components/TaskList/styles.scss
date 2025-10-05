@@ -6,13 +6,24 @@
   border: 1px solid #aaaaaa;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   padding: 8px;
 
   &__entry {
     display: flex;
     flex-direction: row;
-    gap: 10px;
+    gap:8px;
     align-items: center;
+  }
+
+  &__button {
+    background: #cccccc;
+    border: 1px solid #aaaaaa;
+    padding: 8px;
+    border-radius: 3px;
+
+    &:hover {
+      background: #eeeeee;
+    }
   }
 }

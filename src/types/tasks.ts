@@ -12,7 +12,8 @@ export type Task = {
   fileContent: string;
   type: TaskType;
   flip: boolean;
-  hide: boolean;
+  hidePaths: boolean;
+  hideAreas: boolean;
 };
 
 export interface TaskWithPolygons extends Task {
