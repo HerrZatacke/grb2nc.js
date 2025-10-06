@@ -1,31 +1,40 @@
-import { Remote, wrap } from 'comlink';
+import { Remote, wrap, proxy } from 'comlink';
 import { useEffect, useRef } from 'react';
 import { getViewBox } from '@/modules/renderSVG';
 import { transformer } from '@/modules/transformer';
 import { Task, RenderedTask } from '@/types/tasks.ts';
-import type { TansformWorkerApi, TransformWorkerParams, TransformWorkerResult } from '@/workers/transformWorker';
+import {
+  ITansformWorkerApi,
+  TransformWorkerParams,
+  TransformWorkerResult,
+} from '@/workers/transformWorker/functions/types.ts';
 
 interface UseTransformerParams {
   tasks: Task[];
   setBusy: (busy: boolean) => void;
+  setProgress: (progress: number) => void;
   setRenderedTasks: (renderedTasks: RenderedTask[]) => void;
   setViewBox: (viewBox: string) => void;
 }
 
 export const useTransformer = (useTransformerParams: UseTransformerParams) => {
-  const { tasks, setBusy, setRenderedTasks, setViewBox } = useTransformerParams;
-  const workerApi = useRef<Remote<TansformWorkerApi> | null>(null);
+  const { tasks, setBusy, setRenderedTasks, setViewBox, setProgress } = useTransformerParams;
+  const workerApi = useRef<Remote<ITansformWorkerApi> | null>(null);
 
   const scale = transformer.getScale();
 
   useEffect(() => {
+    const worker = new Worker(new URL('@/workers/transformWorker', import.meta.url), { type: 'module' });
     const handle = setTimeout(() => {
-      const worker = new Worker(new URL('@/workers/transformWorker', import.meta.url), { type: 'module' });
-      workerApi.current = wrap<TansformWorkerApi>(worker);
+      workerApi.current = wrap<ITansformWorkerApi>(worker);
+      workerApi.current.setup(proxy(setProgress));
     }, 1);
 
-    return () => clearTimeout(handle);
-  }, []);
+    return () => {
+      clearTimeout(handle);
+      worker.terminate();
+    };
+  }, [setProgress]);
 
   useEffect(() => {
     if (!workerApi.current || !tasks.length) { return; }
@@ -37,6 +46,7 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
       setBusy(false);
     };
 
+    setProgress(0.001);
     setBusy(true);
 
     const params: TransformWorkerParams = {
@@ -51,5 +61,5 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
       .catch((error) => {
         console.error(error);
       });
-  }, [tasks, setBusy, scale, setViewBox, setRenderedTasks]);
+  }, [tasks, setBusy, scale, setViewBox, setRenderedTasks, setProgress]);
 };

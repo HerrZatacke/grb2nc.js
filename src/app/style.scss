@@ -1,2 +1,10 @@
 @use '../styles/base';
 
+.page-content {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

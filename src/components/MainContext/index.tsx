@@ -9,6 +9,7 @@ interface MainContextValue {
   updateTask: (task: Task) => void;
   setTasks: (tasks: Task[]) => void;
   busy: boolean,
+  progress: number,
   setBusy: (busy: boolean) => void;
   renderedTasks: RenderedTask[];
   viewBox: string;
@@ -19,6 +20,7 @@ const mainContext = createContext<MainContextValue | null>(null);
 export function MainProvider({ children }: PropsWithChildren) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [busy, setBusy] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
   const [renderedTasks, setRenderedTasks] = useState<RenderedTask[]>([]);
   const [viewBox, setViewBox] = useState<string>('');
 
@@ -34,17 +36,24 @@ export function MainProvider({ children }: PropsWithChildren) {
     ));
   }, []);
 
-  useTransformer({ tasks, setBusy, setRenderedTasks, setViewBox });
+  useTransformer({
+    tasks,
+    setBusy,
+    setRenderedTasks,
+    setViewBox,
+    setProgress,
+  });
 
   const contextValue: MainContextValue = useMemo(() => ({
     setTasks,
     setBusy,
     tasks,
     busy,
+    progress,
     updateTask,
     renderedTasks,
     viewBox,
-  }), [tasks, busy, updateTask, renderedTasks, viewBox]);
+  }), [tasks, busy, progress, updateTask, renderedTasks, viewBox]);
 
   return (
     <mainContext.Provider value={contextValue}>
