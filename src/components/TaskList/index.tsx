@@ -36,10 +36,10 @@ export default function TaskList() {
               className="task-list__button"
               disabled={busy}
               onClick={() => {
-                updateTask({
-                  ...task,
-                  hideAreas: !task.hideAreas,
-                });
+                updateTask(
+                  task.fileName,
+                  { hideAreas: !task.hideAreas },
+                );
               }}
             >
               <span>
@@ -50,10 +50,10 @@ export default function TaskList() {
               className="task-list__button"
               disabled={busy}
               onClick={() => {
-                updateTask({
-                  ...task,
-                  hidePaths: !task.hidePaths,
-                });
+                updateTask(
+                  task.fileName,
+                  { hidePaths: !task.hidePaths },
+                );
               }}
             >
               <span>
@@ -86,10 +86,10 @@ export default function TaskList() {
                   className="task-list__button"
                   disabled={busy}
                   onClick={() => {
-                    updateTask({
-                      ...task,
-                      steps: Math.max(0, task.steps - 1),
-                    });
+                    updateTask(
+                      task.fileName,
+                      { steps: Math.max(0, task.steps - 1) },
+                    );
                   }}
                 >
                   <span>
@@ -100,10 +100,10 @@ export default function TaskList() {
                   className="task-list__button"
                   disabled={busy}
                   onClick={() => {
-                    updateTask({
-                      ...task,
-                      steps: Math.min(10, task.steps + 1),
-                    });
+                    updateTask(
+                      task.fileName,
+                      { steps: Math.min(10, task.steps + 1) },
+                    );
                   }}
                 >
                   <span>
@@ -121,10 +121,10 @@ export default function TaskList() {
                   className="task-list__button"
                   disabled={busy}
                   onClick={() => {
-                    updateTask({
-                      ...task,
-                      offset: Math.max(0, task.offset - 0.05),
-                    });
+                    updateTask(
+                      task.fileName,
+                      { offset: Math.max(0, task.offset - 0.05) },
+                    );
                   }}
                 >
                   <span>
@@ -135,10 +135,10 @@ export default function TaskList() {
                   className="task-list__button"
                   disabled={busy}
                   onClick={() => {
-                    updateTask({
-                      ...task,
-                      offset: Math.min(2, task.offset + 0.05),
-                    });
+                    updateTask(
+                      task.fileName,
+                      { offset: Math.min(2, task.offset + 0.05) },
+                    );
                   }}
                 >
                   <span>

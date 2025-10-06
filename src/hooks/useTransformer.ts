@@ -39,8 +39,8 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
   useEffect(() => {
     if (!workerApi.current || !tasks.length) { return; }
 
-    const handleResult = ({ bounds, renderedTasks, timings }: TransformWorkerResult) => {
-      console.info(timings.join('\n'));
+    const handleResult = ({ bounds, renderedTasks }: TransformWorkerResult) => {
+      // console.info(timings.join('\n'));
       setViewBox(getViewBox(bounds));
       setRenderedTasks(renderedTasks);
       setBusy(false);

@@ -16,8 +16,6 @@ import {
   TransformWorkerResult,
 } from '@/workers/transformWorker/functions/types.ts';
 
-
-
 class TansformWorkerApi implements ITansformWorkerApi {
   private progressCallback: ProgressCallback = () => {};
   private progressCount = 0;
@@ -30,7 +28,7 @@ class TansformWorkerApi implements ITansformWorkerApi {
 
   private progressTick: ProgressTick = async (): Promise<void> => {
     this.progressCount += 1;
-    console.log(`${'#'.repeat(this.progressCount)}${'-'.repeat(this.progressEstimate - this.progressCount)}`);
+    // console.log(`${'#'.repeat(this.progressCount)}${'-'.repeat(this.progressEstimate - this.progressCount)}`);
     this.progressCallback(this.progressCount / this.progressEstimate);
     await delay(1);
   };
@@ -111,7 +109,7 @@ class TansformWorkerApi implements ITansformWorkerApi {
     const renderedTasks: RenderedTask[] = [];
 
     for (let i = 0; i < transformedTasks.length; i++) {
-      const task = transformedTasks[i];
+      const task = { ...transformedTasks[i] };
       const result = await renderTask({
         scale,
         timings,

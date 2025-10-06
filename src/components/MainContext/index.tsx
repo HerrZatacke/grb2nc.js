@@ -6,7 +6,7 @@ import { Task, RenderedTask } from '@/types/tasks.ts';
 
 interface MainContextValue {
   tasks: Task[];
-  updateTask: (task: Task) => void;
+  updateTask: (fileName: string, updatedTask: Partial<Task>) => void;
   setTasks: (tasks: Task[]) => void;
   busy: boolean,
   progress: number,
@@ -24,14 +24,17 @@ export function MainProvider({ children }: PropsWithChildren) {
   const [renderedTasks, setRenderedTasks] = useState<RenderedTask[]>([]);
   const [viewBox, setViewBox] = useState<string>('');
 
-  const updateTask = useCallback((updatedTask: Task) => {
+  const updateTask = useCallback((fileName: string, updatedTask: Partial<Task>) => {
     setTasks((currentTasks) => (
       currentTasks.map((currentTask: Task) => {
-        if (currentTask.fileName !== updatedTask.fileName) {
+        if (currentTask.fileName !== fileName) {
           return currentTask;
         }
 
-        return updatedTask;
+        return {
+          ...currentTask,
+          ...updatedTask,
+        };
       })
     ));
   }, []);
