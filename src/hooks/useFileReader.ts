@@ -52,7 +52,7 @@ const tasksAreEqual = (arr1: Task[], arr2: Task[]): boolean => {
 };
 
 export const useFileReader = (): UseFileReader => {
-  const { tasks, setTasks } = useMainContext();
+  const { tasks, setTasks, setActiveHandles } = useMainContext();
   const [fileHandles, setFileHandles] = useState<FileSystemFileHandle[]>();
   const [canUseFilePicker, setCanUseFilePicker] = useState(false);
 
@@ -73,8 +73,10 @@ export const useFileReader = (): UseFileReader => {
       });
 
       setFileHandles(handles);
+      setActiveHandles(handles.length);
     } catch {
       setFileHandles([]);
+      setActiveHandles(0);
     }
   }, []);
 

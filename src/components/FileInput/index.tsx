@@ -8,6 +8,8 @@ import './styles.scss';
 
 
 export default function FileInput() {
+  const { activeHandles } = useMainContext();
+
   const {
     canUseFilePicker,
     onFileInputChange,
@@ -31,7 +33,7 @@ export default function FileInput() {
           onClick={requestInputHandle}
           disabled={busy}
         >
-          Watch File(s)
+          { activeHandles ? `Watching ${activeHandles} File(s)` : 'Watch File(s)'}
         </button>
       ) : (
         <label className={buttonClass}>

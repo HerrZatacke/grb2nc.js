@@ -10,7 +10,9 @@ interface MainContextValue {
   setTasks: (tasks: Task[]) => void;
   busy: boolean,
   progress: number,
+  activeHandles: number,
   setBusy: (busy: boolean) => void;
+  setActiveHandles: (count: number) => void;
   renderedTasks: RenderedTask[];
   viewBox: string;
 }
@@ -20,6 +22,7 @@ const mainContext = createContext<MainContextValue | null>(null);
 export function MainProvider({ children }: PropsWithChildren) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [busy, setBusy] = useState<boolean>(false);
+  const [activeHandles, setActiveHandles] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
   const [renderedTasks, setRenderedTasks] = useState<RenderedTask[]>([]);
   const [viewBox, setViewBox] = useState<string>('');
@@ -50,13 +53,15 @@ export function MainProvider({ children }: PropsWithChildren) {
   const contextValue: MainContextValue = useMemo(() => ({
     setTasks,
     setBusy,
+    setActiveHandles,
     tasks,
     busy,
     progress,
+    activeHandles,
     updateTask,
     renderedTasks,
     viewBox,
-  }), [tasks, busy, progress, updateTask, renderedTasks, viewBox]);
+  }), [tasks, busy, progress, activeHandles, updateTask, renderedTasks, viewBox]);
 
   return (
     <mainContext.Provider value={contextValue}>
