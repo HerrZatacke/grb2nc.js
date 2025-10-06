@@ -119,8 +119,12 @@ export const useFileReader = (): UseFileReader => {
     const updateHandles = async () => {
       const newTasks: Task[] = (await Promise.all(
         fileHandles.map(async (handle): Promise<Task | null> => {
-          const file = await handle.getFile();
-          return createTaskFromFile(file);
+          try {
+            const file = await handle.getFile();
+            return createTaskFromFile(file);
+          } catch {
+            return null;
+          }
         }),
       ))
         .filter(Boolean) as Task[];
