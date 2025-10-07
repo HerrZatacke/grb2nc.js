@@ -3,8 +3,13 @@ import { transformer } from '@/modules/transformer';
 import { Point, Polygon } from '@/types/geo';
 import { TaskType } from '@/types/tasks.ts';
 
-const SVG_SCALE = parseInt(process.env.NEXT_PUBLIC_SVG_SCALE || '0', 10);
-const SVG_VIEWBOX_OFFSET = SVG_SCALE * 2;
+interface StrokeProps {
+  stroke: string;
+  strokeWidth: string;
+}
+
+export const SVG_SCALE = parseInt(process.env.NEXT_PUBLIC_SVG_SCALE || '0', 10);
+export const SVG_VIEWBOX_OFFSET = SVG_SCALE * 4;
 
 export const polygonsToSVGPaths = (polygons: Polygon[], precision: number): string[] => {
   return polygons.reduce((path: string[], points: Point[]): string[] => {
@@ -35,19 +40,50 @@ export const getColor = (taskType: TaskType, flip: boolean): string => {
   return flip ? '0,64,255' : '255,64,0';
 };
 
-export const getViewBox = (bounds: IntRect): string => {
-  const scale = transformer.getScale();
-  const x = SVG_SCALE * bounds.left / scale;
-  const y = SVG_SCALE * bounds.top / scale;
-  const w = SVG_SCALE * (bounds.right - bounds.left) / scale;
-  const h = SVG_SCALE * (bounds.bottom - bounds.top) / scale;
+export const getGridStrokeProps = (index?: number): StrokeProps => {
+  const iMod = index ? index % 10 : 0;
+  const isOrigin = ((index || 0) * SVG_SCALE) === SVG_VIEWBOX_OFFSET;
+  const isStrong = (iMod * SVG_SCALE) === SVG_VIEWBOX_OFFSET;
 
-  return [
-    Math.round(x -SVG_VIEWBOX_OFFSET),
-    Math.round(y -SVG_VIEWBOX_OFFSET),
-    Math.round(w + (2 * SVG_VIEWBOX_OFFSET)),
-    Math.round(h + (2 * SVG_VIEWBOX_OFFSET)),
-  ].join(' ');
+  if (isOrigin) {
+    return {
+      stroke: 'rgba(0, 0, 0, 0.7)',
+      strokeWidth: (0.0125 * SVG_SCALE).toFixed(2),
+    };
+  }
+
+  if (isStrong) {
+    return {
+      stroke: 'rgba(0, 0, 0, 0.6)',
+      strokeWidth: (0.0075 * SVG_SCALE).toFixed(2),
+    };
+  }
+
+  return {
+    stroke: 'rgba(0, 0, 0, 0.3)',
+    strokeWidth: (0.005 * SVG_SCALE).toFixed(2),
+  };
+};
+
+export const getSVGBounds = (bounds: IntRect): IntRect => {
+  const scale = transformer.getScale();
+
+  return {
+    left: Math.round(SVG_SCALE * bounds.left / scale) - SVG_VIEWBOX_OFFSET,
+    top: Math.round(SVG_SCALE * bounds.top / scale) - SVG_VIEWBOX_OFFSET,
+    right: Math.round(SVG_SCALE * bounds.right / scale) + SVG_VIEWBOX_OFFSET,
+    bottom: Math.round(SVG_SCALE * bounds.bottom / scale) + SVG_VIEWBOX_OFFSET,
+  };
+};
+
+export const getViewBox = (bounds: IntRect): string => {
+  const svgBounds = getSVGBounds(bounds);
+  const x = svgBounds.left;
+  const y = svgBounds.top;
+  const w = (svgBounds.right - svgBounds.left);
+  const h = (svgBounds.bottom - svgBounds.top);
+
+  return [x, y, w, h].join(' ');
 };
 
 export const getAreaStroke = (): string => {

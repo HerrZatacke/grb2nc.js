@@ -1,8 +1,8 @@
+import { IntRect } from 'clipper-lib';
 import { Remote, wrap, proxy } from 'comlink';
 import { useEffect, useRef } from 'react';
-import { getViewBox } from '@/modules/renderSVG';
 import { transformer } from '@/modules/transformer';
-import { Task, RenderedTask } from '@/types/tasks.ts';
+import { Task, RenderedTask, Units } from '@/types/tasks.ts';
 import {
   ITansformWorkerApi,
   TransformWorkerParams,
@@ -14,11 +14,12 @@ interface UseTransformerParams {
   setBusy: (busy: boolean) => void;
   setProgress: (progress: number) => void;
   setRenderedTasks: (renderedTasks: RenderedTask[]) => void;
-  setViewBox: (viewBox: string) => void;
+  setGlobalBounds: (bounds: IntRect) => void;
+  setGlobalUnits: (units: Units) => void;
 }
 
 export const useTransformer = (useTransformerParams: UseTransformerParams) => {
-  const { tasks, setBusy, setRenderedTasks, setViewBox, setProgress } = useTransformerParams;
+  const { tasks, setBusy, setRenderedTasks, setGlobalBounds, setProgress, setGlobalUnits } = useTransformerParams;
   const workerApi = useRef<Remote<ITansformWorkerApi> | null>(null);
 
   const scale = transformer.getScale();
@@ -39,9 +40,10 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
   useEffect(() => {
     if (!workerApi.current || !tasks.length) { return; }
 
-    const handleResult = ({ bounds, renderedTasks }: TransformWorkerResult) => {
+    const handleResult = ({ bounds, renderedTasks, units }: TransformWorkerResult) => {
       // console.info(timings.join('\n'));
-      setViewBox(getViewBox(bounds));
+      setGlobalBounds(bounds);
+      setGlobalUnits(units);
       setRenderedTasks(renderedTasks);
       setBusy(false);
     };
@@ -61,5 +63,5 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
       .catch((error) => {
         console.error(error);
       });
-  }, [tasks, setBusy, scale, setViewBox, setRenderedTasks, setProgress]);
+  }, [tasks, setBusy, scale, setGlobalBounds, setRenderedTasks, setProgress, setGlobalUnits]);
 };

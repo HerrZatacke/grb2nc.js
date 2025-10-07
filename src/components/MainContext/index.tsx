@@ -1,8 +1,10 @@
 'use client';
 
-import { PropsWithChildren, useCallback, useState, createContext, useContext, useMemo } from 'react';
+import { IntRect } from 'clipper-lib';
+import { createContext, PropsWithChildren, useCallback, useContext, useMemo, useState } from 'react';
 import { useTransformer } from '@/hooks/useTransformer.ts';
-import { Task, RenderedTask } from '@/types/tasks.ts';
+import { RenderedTask, Task, Units } from '@/types/tasks.ts';
+import { defaultBounds } from '@/workers/transformWorker/functions/defaultBounds.ts';
 
 interface MainContextValue {
   tasks: Task[];
@@ -14,7 +16,8 @@ interface MainContextValue {
   setBusy: (busy: boolean) => void;
   setActiveHandles: (count: number) => void;
   renderedTasks: RenderedTask[];
-  viewBox: string;
+  globalBounds: IntRect;
+  globalUnits: Units;
 }
 
 const mainContext = createContext<MainContextValue | null>(null);
@@ -25,7 +28,8 @@ export function MainProvider({ children }: PropsWithChildren) {
   const [activeHandles, setActiveHandles] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
   const [renderedTasks, setRenderedTasks] = useState<RenderedTask[]>([]);
-  const [viewBox, setViewBox] = useState<string>('');
+  const [globalBounds, setGlobalBounds] = useState<IntRect>(() => defaultBounds(0));
+  const [globalUnits, setGlobalUnits] = useState<Units>(Units.MILLIMETERS);
 
   const updateTask = useCallback((fileName: string, updatedTask: Partial<Task>) => {
     setTasks((currentTasks) => (
@@ -46,7 +50,8 @@ export function MainProvider({ children }: PropsWithChildren) {
     tasks,
     setBusy,
     setRenderedTasks,
-    setViewBox,
+    setGlobalBounds,
+    setGlobalUnits,
     setProgress,
   });
 
@@ -60,8 +65,9 @@ export function MainProvider({ children }: PropsWithChildren) {
     activeHandles,
     updateTask,
     renderedTasks,
-    viewBox,
-  }), [tasks, busy, progress, activeHandles, updateTask, renderedTasks, viewBox]);
+    globalBounds,
+    globalUnits,
+  }), [tasks, busy, progress, activeHandles, updateTask, renderedTasks, globalBounds, globalUnits]);
 
   return (
     <mainContext.Provider value={contextValue}>

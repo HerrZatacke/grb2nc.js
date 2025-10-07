@@ -11,4 +11,8 @@
     height: 100vh;
     transform: scaleY(-1); // flip the output of svg visually
   }
+
+  text {
+    transform: scaleY(-1); // flip the output of svg visually
+  }
 }

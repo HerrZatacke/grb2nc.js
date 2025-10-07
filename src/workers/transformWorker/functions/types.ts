@@ -1,6 +1,6 @@
 import { IntRect } from 'clipper-lib';
 import { Polygon } from '@/types/geo';
-import { RenderedTask, Task, TaskType } from '@/types/tasks.ts';
+import { RenderedTask, Task, TaskType, Units } from '@/types/tasks.ts';
 
 export type ProgressCallback = (progress: number) => void;
 export type ProgressTick = () => Promise<void>;
@@ -14,6 +14,7 @@ export interface TransformWorkerParams {
 export interface TransformWorkerResult {
   renderedTasks: RenderedTask[];
   bounds: IntRect;
+  units: Units;
   timings: string[];
 }
 

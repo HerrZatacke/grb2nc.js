@@ -10,8 +10,10 @@ import { closePath } from '@/workers/transformWorker/functions/closePath.ts';
 import { defaultBounds } from '@/workers/transformWorker/functions/defaultBounds.ts';
 import { renderTask } from '@/workers/transformWorker/functions/renderTask.ts';
 import {
-  ITansformWorkerApi, ProgressAddEstimate,
-  ProgressCallback, ProgressTick,
+  ITansformWorkerApi,
+  ProgressAddEstimate,
+  ProgressCallback,
+  ProgressTick,
   TransformWorkerParams,
   TransformWorkerResult,
 } from '@/workers/transformWorker/functions/types.ts';
@@ -49,6 +51,7 @@ class TansformWorkerApi implements ITansformWorkerApi {
       return {
         renderedTasks: [],
         bounds: defaultBounds(0),
+        units: Units.MILLIMETERS,
         timings: ['No tasks, nothing to do.'],
       };
     }
@@ -68,6 +71,8 @@ class TansformWorkerApi implements ITansformWorkerApi {
 
       const unitsNode = syntaxTree.children.find(({ type }) => (type === UNITS)) as (UnitsNode | undefined);
       const units = unitsNode && unitsNode.units === 'in' ? Units.INCHES : Units.MILLIMETERS;
+
+      console.log(units);
 
       const imageTree = plot(syntaxTree);
       transformer.run(imageTree, task.type);
@@ -104,6 +109,20 @@ class TansformWorkerApi implements ITansformWorkerApi {
       }, defaultBounds(Infinity));
     }
 
+    const globalUnits: Units = transformedTasks.reduce((acc: Units | null, { units }): Units => {
+      if (acc === null) {
+        return units;
+      }
+
+      if (acc !== units) {
+        console.log('Using mixed units');
+        return Units.MILLIMETERS;
+      }
+
+      return acc;
+    }, null) || Units.MILLIMETERS;
+
+
     await this.progressTick();
 
     const renderedTasks: RenderedTask[] = [];
@@ -124,6 +143,7 @@ class TansformWorkerApi implements ITansformWorkerApi {
 
     const result: TransformWorkerResult = {
       bounds: globalBounds,
+      units: globalUnits,
       renderedTasks,
       timings,
     };
