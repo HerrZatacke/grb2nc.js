@@ -1,11 +1,11 @@
 import { saveAs } from 'file-saver';
 import { useCallback } from 'react';
+import { useMainContext } from '@/components/MainContext';
 import { transformer } from '@/modules/transformer';
 import { Polygon } from '@/types/geo';
-import { RenderedTask } from '@/types/tasks.ts';
 
 interface UseDownloadNC {
-  downloadNCCode: (task: RenderedTask) => void;
+  downloadNCCode: (fileName: string) => void;
 }
 
 interface GCodeParams {
@@ -83,10 +83,15 @@ function generateGCode(params: GCodeParams): string {
 }
 
 export const useDownloadNC = (): UseDownloadNC => {
-  const downloadNCCode = useCallback((task: RenderedTask) => {
-    // console.log(task.offsetPaths.flat(1));
+  const { renderedTasks } = useMainContext();
+  const downloadNCCode = useCallback((fileName: string) => {
+    const renderedTask = renderedTasks.find((task) => (task.fileName === fileName));
+
+    if (!renderedTask) { return; }
+
+    // console.log(renderedTask.offsetPaths.flat(1));
     const gCode = generateGCode({
-      contours: task.offsetPaths.flat(1),
+      contours: renderedTask.offsetPaths.flat(1),
       scale: transformer.getScale(),
       zPasses: 1,
       zStep: 0,
@@ -95,7 +100,7 @@ export const useDownloadNC = (): UseDownloadNC => {
       feedXY: 800,
     });
     saveAs(new Blob([gCode]), 'gcode.nc');
-  }, []);
+  }, [renderedTasks]);
 
   return {
     downloadNCCode,

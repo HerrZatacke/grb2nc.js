@@ -16,10 +16,11 @@ interface UseTransformerParams {
   setRenderedTasks: (renderedTasks: RenderedTask[]) => void;
   setGlobalBounds: (bounds: IntRect) => void;
   setGlobalUnits: (units: Units) => void;
+  setGlobalError: (error: string) => void;
 }
 
 export const useTransformer = (useTransformerParams: UseTransformerParams) => {
-  const { tasks, setBusy, setRenderedTasks, setGlobalBounds, setProgress, setGlobalUnits } = useTransformerParams;
+  const { tasks, setBusy, setRenderedTasks, setGlobalBounds, setProgress, setGlobalError, setGlobalUnits } = useTransformerParams;
   const workerApi = useRef<Remote<ITansformWorkerApi> | null>(null);
 
   const scale = transformer.getScale();
@@ -28,14 +29,14 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
     const worker = new Worker(new URL('@/workers/transformWorker', import.meta.url), { type: 'module' });
     const handle = setTimeout(() => {
       workerApi.current = wrap<ITansformWorkerApi>(worker);
-      workerApi.current.setup(proxy(setProgress));
+      workerApi.current.setup(proxy(setProgress), proxy(setGlobalError));
     }, 1);
 
     return () => {
       clearTimeout(handle);
       worker.terminate();
     };
-  }, [setProgress]);
+  }, [setGlobalError, setProgress]);
 
   useEffect(() => {
     if (!workerApi.current || !tasks.length) { return; }
@@ -49,6 +50,7 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
     };
 
     setProgress(0.001);
+    setGlobalError('');
     setBusy(true);
 
     const params: TransformWorkerParams = {
@@ -57,11 +59,9 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
     };
 
     workerApi.current.calculate(params)
-      .then((result) => {
-        handleResult(result);
-      })
+      .then(handleResult)
       .catch((error) => {
-        console.error(error);
+        setGlobalError((error as Error).message);
       });
-  }, [tasks, setBusy, scale, setGlobalBounds, setRenderedTasks, setProgress, setGlobalUnits]);
+  }, [tasks, setBusy, scale, setGlobalBounds, setRenderedTasks, setProgress, setGlobalUnits, setGlobalError]);
 };

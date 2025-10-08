@@ -13,6 +13,7 @@ import {
   ITansformWorkerApi,
   ProgressAddEstimate,
   ProgressCallback,
+  ErrorCallback,
   ProgressTick,
   TransformWorkerParams,
   TransformWorkerResult,
@@ -20,12 +21,14 @@ import {
 
 class TansformWorkerApi implements ITansformWorkerApi {
   private progressCallback: ProgressCallback = () => {};
+  private errorCallback: ErrorCallback = () => {};
   private progressCount = 0;
   private progressEstimate = 0;
   private resultMap: Map<string, TransformWorkerResult> = new Map([]);
 
-  setup(onProgress: ProgressCallback) {
+  setup(onProgress: ProgressCallback, onError: ErrorCallback) {
     this.progressCallback = onProgress;
+    this.errorCallback = onError;
   };
 
   private progressTick: ProgressTick = async (): Promise<void> => {
@@ -72,10 +75,13 @@ class TansformWorkerApi implements ITansformWorkerApi {
       const unitsNode = syntaxTree.children.find(({ type }) => (type === UNITS)) as (UnitsNode | undefined);
       const units = unitsNode && unitsNode.units === 'in' ? Units.INCHES : Units.MILLIMETERS;
 
-      console.log(units);
-
       const imageTree = plot(syntaxTree);
-      transformer.run(imageTree, task.type);
+
+      try {
+        transformer.run(imageTree, task.type);
+      } catch (error) {
+        this.errorCallback((error as Error).message);
+      }
 
       const polygons = transformer.result(task.type).map(closePath);
 
@@ -115,7 +121,7 @@ class TansformWorkerApi implements ITansformWorkerApi {
       }
 
       if (acc !== units) {
-        console.log('Using mixed units');
+        this.errorCallback('Using mixed units');
         return Units.MILLIMETERS;
       }
 

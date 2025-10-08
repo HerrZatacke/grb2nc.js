@@ -78,7 +78,7 @@ export const useFileReader = (): UseFileReader => {
       setFileHandles([]);
       setActiveHandles(0);
     }
-  }, []);
+  }, [setActiveHandles]);
 
   const createTaskFromFile = useCallback(async (taskFile: File): Promise<Task | null> => {
     const name = (taskFile.name as string).toLowerCase();

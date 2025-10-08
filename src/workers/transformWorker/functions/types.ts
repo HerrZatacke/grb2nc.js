@@ -3,6 +3,7 @@ import { Polygon } from '@/types/geo';
 import { RenderedTask, Task, TaskType, Units } from '@/types/tasks.ts';
 
 export type ProgressCallback = (progress: number) => void;
+export type ErrorCallback = (error: string) => void;
 export type ProgressTick = () => Promise<void>;
 export type ProgressAddEstimate = (items: number) => void;
 
@@ -19,7 +20,7 @@ export interface TransformWorkerResult {
 }
 
 export interface ITansformWorkerApi {
-  setup: (onProgress: ProgressCallback) => void;
+  setup: (onProgress: ProgressCallback, onError: ErrorCallback) => void;
   calculate: (params: TransformWorkerParams) => Promise<TransformWorkerResult>;
 }
 

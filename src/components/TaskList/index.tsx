@@ -19,14 +19,14 @@ const typeIcon = (type: TaskType): string => {
 };
 
 export default function TaskList() {
-  const { renderedTasks, updateTask, busy } = useMainContext();
+  const { tasks, updateTask, busy } = useMainContext();
   const { downloadNCCode } = useDownloadNC();
-  if (!renderedTasks.length) { return null; }
+  if (!tasks.length) { return null; }
 
   return (
     <div className="task-list">
-      {renderedTasks.map((task) => {
-        const { fileName, type, steps, offset, units } = task;
+      {tasks.map((task) => {
+        const { fileName, type, steps, offset } = task;
         return (
           <span
             key={fileName}
@@ -64,7 +64,7 @@ export default function TaskList() {
               className="task-list__button"
               disabled={busy}
               onClick={() => {
-                downloadNCCode(task);
+                downloadNCCode(task.fileName);
               }}
             >
               <span>
@@ -115,7 +115,7 @@ export default function TaskList() {
             {type !== TaskType.DRILL && (
               <>
                 <code>
-                  {`offset ${offset.toFixed(2)}${units}`}
+                  {`offset ${offset.toFixed(2)}`}
                 </code>
                 <button
                   className="task-list__button"
