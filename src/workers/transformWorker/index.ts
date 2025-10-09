@@ -115,15 +115,20 @@ class TansformWorkerApi implements ITansformWorkerApi {
       }, defaultBounds(Infinity));
     }
 
-    const globalUnits: Units = transformedTasks.reduce((acc: Units | null, { units }): Units => {
+    const globalUnits: Units = transformedTasks.reduce((acc: Units | null, { fileName, units }): Units => {
+      if (units === Units.INCHES) {
+        this.errorCallback(`${fileName} is using inches, which is currently not supported`);
+      }
+
       if (acc === null) {
         return units;
       }
 
-      if (acc !== units) {
-        this.errorCallback('Using mixed units');
-        return Units.MILLIMETERS;
-      }
+      // Enable warning for mixed units if it's possible to support inches generally
+      // if (acc !== units) {
+      //   this.errorCallback('Using mixed units');
+      //   return Units.MILLIMETERS;
+      // }
 
       return acc;
     }, null) || Units.MILLIMETERS;

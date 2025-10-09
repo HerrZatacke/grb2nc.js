@@ -13,7 +13,7 @@ interface MainContextValue {
   busy: boolean,
   progress: number,
   activeHandles: number,
-  globalError: string,
+  globalErrors: string[],
   setBusy: (busy: boolean) => void;
   setActiveHandles: (count: number) => void;
   renderedTasks: RenderedTask[];
@@ -31,7 +31,7 @@ export function MainProvider({ children }: PropsWithChildren) {
   const [renderedTasks, setRenderedTasks] = useState<RenderedTask[]>([]);
   const [globalBounds, setGlobalBounds] = useState<IntRect>(() => defaultBounds(0));
   const [globalUnits, setGlobalUnits] = useState<Units>(Units.MILLIMETERS);
-  const [globalError, setGlobalError] = useState<string>('');
+  const [globalErrors, setGlobalErrors] = useState<string[]>([]);
 
   const updateTask = useCallback((fileName: string, updatedTask: Partial<Task>) => {
     setTasks((currentTasks) => (
@@ -48,6 +48,17 @@ export function MainProvider({ children }: PropsWithChildren) {
     ));
   }, []);
 
+  const setGlobalError = useCallback((errorText: string) => {
+    setGlobalErrors((currentErrors) => ([
+      ...currentErrors,
+      errorText,
+    ]));
+  }, []);
+
+  const resetGlobalError = useCallback(() => {
+    setGlobalErrors([]);
+  }, []);
+
   useTransformer({
     tasks,
     setBusy,
@@ -55,6 +66,7 @@ export function MainProvider({ children }: PropsWithChildren) {
     setGlobalBounds,
     setGlobalUnits,
     setGlobalError,
+    resetGlobalError,
     setProgress,
   });
 
@@ -66,12 +78,12 @@ export function MainProvider({ children }: PropsWithChildren) {
     busy,
     progress,
     activeHandles,
-    globalError,
+    globalErrors,
     updateTask,
     renderedTasks,
     globalBounds,
     globalUnits,
-  }), [tasks, busy, progress, activeHandles, globalError, updateTask, renderedTasks, globalBounds, globalUnits]);
+  }), [tasks, busy, progress, activeHandles, globalErrors, updateTask, renderedTasks, globalBounds, globalUnits]);
 
   return (
     <mainContext.Provider value={contextValue}>

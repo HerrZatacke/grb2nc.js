@@ -4,13 +4,20 @@ import { useMainContext } from '@/components/MainContext';
 import './styles.scss';
 
 export default function Error() {
-  const { globalError } = useMainContext();
+  const { globalErrors } = useMainContext();
 
-  if (!globalError) { return null; }
+  if (!globalErrors.length) { return null; }
 
   return (
-    <div className="global-error">
-      { globalError }
-    </div>
+    <>
+      { globalErrors.map((errorText, index) => (
+        <div
+          key={index}
+          className="global-error"
+        >
+          { errorText }
+        </div>
+      ))}
+    </>
   );
 }
