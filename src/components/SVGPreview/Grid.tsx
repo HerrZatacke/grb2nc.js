@@ -3,7 +3,7 @@ import {
   getGridStrokeProps,
   getSVGBounds,
   SVG_SCALE,
-  SVG_VIEWBOX_OFFSET,
+  SVG_SCALED_VIEWBOX_OFFSET,
 } from '@/modules/renderSVG';
 
 export function Grid() {
@@ -15,22 +15,22 @@ export function Grid() {
   const right = svgBounds.right;
   const bottom = svgBounds.bottom;
 
-  const numXLines = Math.ceil((right - left) / SVG_SCALE);
-  const numYLines = Math.ceil((bottom - top) / SVG_SCALE);
+  const numXLines = Math.floor((right - left) / SVG_SCALE) + 1;
+  const numYLines = Math.floor((bottom - top) / SVG_SCALE) + 1;
 
   return (
     <>
       <g>
         <circle
-          cx={left + SVG_VIEWBOX_OFFSET}
-          cy={top + SVG_VIEWBOX_OFFSET}
+          cx={left + SVG_SCALED_VIEWBOX_OFFSET}
+          cy={top + SVG_SCALED_VIEWBOX_OFFSET}
           r={0.5 * SVG_SCALE}
           fill="none"
           {...getGridStrokeProps()}
         />
         <text
-          x={left + SVG_VIEWBOX_OFFSET + (0.3 * SVG_SCALE)}
-          y={top + SVG_VIEWBOX_OFFSET + (0.9 * SVG_SCALE)}
+          x={left + SVG_SCALED_VIEWBOX_OFFSET + (0.3 * SVG_SCALE)}
+          y={top + SVG_SCALED_VIEWBOX_OFFSET + (0.9 * SVG_SCALE)}
           fill="rgba(0, 0, 0, 0.4)"
           style={{ fontSize: `${0.5 * SVG_SCALE}px` }}
         >

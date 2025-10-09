@@ -9,7 +9,8 @@ interface StrokeProps {
 }
 
 export const SVG_SCALE = parseInt(process.env.NEXT_PUBLIC_SVG_SCALE || '0', 10);
-export const SVG_VIEWBOX_OFFSET = SVG_SCALE * 4;
+export const SVG_VIEWBOX_OFFSET = 4;
+export const SVG_SCALED_VIEWBOX_OFFSET = SVG_VIEWBOX_OFFSET * SVG_SCALE;
 
 export const polygonsToSVGPaths = (polygons: Polygon[], precision: number): string[] => {
   return polygons.reduce((path: string[], points: Point[]): string[] => {
@@ -42,8 +43,8 @@ export const getColor = (taskType: TaskType, flip: boolean): string => {
 
 export const getGridStrokeProps = (index?: number): StrokeProps => {
   const iMod = index ? index % 10 : 0;
-  const isOrigin = ((index || 0) * SVG_SCALE) === SVG_VIEWBOX_OFFSET;
-  const isStrong = (iMod * SVG_SCALE) === SVG_VIEWBOX_OFFSET;
+  const isOrigin = ((index || 0) * SVG_SCALE) === SVG_SCALED_VIEWBOX_OFFSET;
+  const isStrong = (iMod * SVG_SCALE) === SVG_SCALED_VIEWBOX_OFFSET;
 
   if (isOrigin) {
     return {
@@ -69,10 +70,10 @@ export const getSVGBounds = (bounds: IntRect): IntRect => {
   const scale = transformer.getScale();
 
   return {
-    left: Math.round(SVG_SCALE * bounds.left / scale) - SVG_VIEWBOX_OFFSET,
-    top: Math.round(SVG_SCALE * bounds.top / scale) - SVG_VIEWBOX_OFFSET,
-    right: Math.round(SVG_SCALE * bounds.right / scale) + SVG_VIEWBOX_OFFSET,
-    bottom: Math.round(SVG_SCALE * bounds.bottom / scale) + SVG_VIEWBOX_OFFSET,
+    left: SVG_SCALE * Math.round((bounds.left / scale) - SVG_VIEWBOX_OFFSET),
+    top: SVG_SCALE * Math.round((bounds.top / scale) - SVG_VIEWBOX_OFFSET),
+    right: SVG_SCALE * Math.round((bounds.right / scale) + SVG_VIEWBOX_OFFSET),
+    bottom: SVG_SCALE * Math.round((bounds.bottom / scale) + SVG_VIEWBOX_OFFSET),
   };
 };
 
