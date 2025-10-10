@@ -1,11 +1,11 @@
 'use client';
 
+import './styles.scss';
 import { useMemo } from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useMainContext } from '@/components/MainContext';
 import { Grid } from '@/components/SVGPreview/Grid.tsx';
 import { getViewBox } from '@/modules/renderSVG';
-import './styles.scss';
 
 export default function SVGPreview() {
   const { renderedTasks, globalBounds } = useMainContext();

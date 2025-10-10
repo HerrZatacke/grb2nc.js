@@ -1,7 +1,7 @@
 'use client';
 
-import { useMainContext } from '@/components/MainContext';
 import './styles.scss';
+import { useMainContext } from '@/components/MainContext';
 
 export default function Error() {
   const { globalErrors } = useMainContext();
