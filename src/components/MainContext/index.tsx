@@ -2,13 +2,17 @@
 
 import { IntRect } from 'clipper-lib';
 import { createContext, PropsWithChildren, useCallback, useContext, useMemo, useState } from 'react';
+import { useLocalStorage } from 'react-storage-complete';
 import { useTransformer } from '@/hooks/useTransformer.ts';
-import { RenderedTask, Task, Units } from '@/types/tasks.ts';
+import { machiningDefaultOperations } from '@/modules/machining/machiningDefaults.ts';
+import { MachiningOperations, MachiningParams } from '@/types/machining.ts';
+import { RenderedTask, Task, TaskType, Units } from '@/types/tasks.ts';
 import { defaultBounds } from '@/workers/transformWorker/functions/defaultBounds.ts';
 
 interface MainContextValue {
   tasks: Task[];
   updateTask: (fileName: string, updatedTask: Partial<Task>) => void;
+  updateMachiningOperationParam: (taskType: TaskType, param: keyof MachiningParams, value: string) => void;
   setTasks: (tasks: Task[]) => void;
   busy: boolean,
   progress: number,
@@ -19,7 +23,12 @@ interface MainContextValue {
   renderedTasks: RenderedTask[];
   globalBounds: IntRect;
   globalUnits: Units;
+  machiningOperations: MachiningOperations;
+  operationForm: TaskType | null;
+  setOprtationForm: (operationForm: TaskType | null) => void;
 }
+
+const MACHINING_PARAMS_STORAGE_KEY = 'machiningParams';
 
 const mainContext = createContext<MainContextValue | null>(null);
 
@@ -32,6 +41,8 @@ export function MainProvider({ children }: PropsWithChildren) {
   const [globalBounds, setGlobalBounds] = useState<IntRect>(() => defaultBounds(0));
   const [globalUnits, setGlobalUnits] = useState<Units>(Units.MILLIMETERS);
   const [globalErrors, setGlobalErrors] = useState<string[]>([]);
+  const [machiningOperations, setMachiningOperations] = useLocalStorage<MachiningOperations>(MACHINING_PARAMS_STORAGE_KEY, machiningDefaultOperations());
+  const [operationForm, setOprtationForm] = useState<TaskType | null>(null);
 
   const updateTask = useCallback((fileName: string, updatedTask: Partial<Task>) => {
     setTasks((currentTasks) => (
@@ -47,6 +58,19 @@ export function MainProvider({ children }: PropsWithChildren) {
       })
     ));
   }, []);
+
+  const updateMachiningOperationParam = useCallback((taskType: TaskType, param: keyof MachiningParams, value: string) => {
+    const currentOperations = machiningOperations || machiningDefaultOperations();
+    const updatedParams: MachiningParams = {
+      ...currentOperations[taskType],
+      [param]: value,
+    };
+
+    setMachiningOperations({
+      ...currentOperations,
+      [taskType]: updatedParams,
+    });
+  }, [machiningOperations, setMachiningOperations]);
 
   const setGlobalError = useCallback((errorText: string) => {
     setGlobalErrors((currentErrors) => ([
@@ -74,16 +98,20 @@ export function MainProvider({ children }: PropsWithChildren) {
     setTasks,
     setBusy,
     setActiveHandles,
+    setOprtationForm,
     tasks,
     busy,
     progress,
     activeHandles,
     globalErrors,
     updateTask,
+    updateMachiningOperationParam,
     renderedTasks,
     globalBounds,
     globalUnits,
-  }), [tasks, busy, progress, activeHandles, globalErrors, updateTask, renderedTasks, globalBounds, globalUnits]);
+    operationForm,
+    machiningOperations: machiningOperations as MachiningOperations,
+  }), [tasks, busy, progress, activeHandles, globalErrors, updateTask, updateMachiningOperationParam, renderedTasks, globalBounds, globalUnits, operationForm, machiningOperations]);
 
   return (
     <mainContext.Provider value={contextValue}>

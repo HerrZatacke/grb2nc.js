@@ -4,6 +4,7 @@ import { useMainContext } from '@/components/MainContext';
 import { useDownloadNC } from '@/hooks/useDownloadNC.ts';
 import './styles.scss';
 import { TaskType } from '@/types/tasks.ts';
+import {InputField} from "@/components/InputField";
 
 const typeIcon = (type: TaskType): string => {
   switch (type) {
@@ -19,13 +20,13 @@ const typeIcon = (type: TaskType): string => {
 };
 
 export default function TaskList() {
-  const { tasks, updateTask, busy } = useMainContext();
+  const { tasks, updateTask, busy, setOprtationForm, globalUnits } = useMainContext();
   const { downloadNCCode } = useDownloadNC();
   if (!tasks.length) { return null; }
 
   return (
     <div className="task-list">
-      {tasks.map((task) => {
+      {tasks.map((task, index) => {
         const { fileName, type, steps, offset } = task;
         return (
           <span
@@ -71,6 +72,17 @@ export default function TaskList() {
               💾
               </span>
             </button>
+            <button
+              className="task-list__button"
+              disabled={busy}
+              onClick={() => {
+                setOprtationForm(task.type);
+              }}
+            >
+              <span>
+              ✏️
+              </span>
+            </button>
             <span>
               {typeIcon(type)}
             </span>
@@ -114,37 +126,21 @@ export default function TaskList() {
             )}
             {type !== TaskType.DRILL && (
               <>
-                <code>
-                  {`offset ${offset.toFixed(2)}`}
-                </code>
-                <button
-                  className="task-list__button"
-                  disabled={busy}
-                  onClick={() => {
+                <InputField
+                  label="Offset"
+                  fieldName={`${type}-${index}-offset`}
+                  value={offset.toFixed(2)}
+                  precision={2}
+                  step={0.01}
+                  unit={globalUnits}
+                  onChange={(newValue) => {
+                    const numericValue = parseFloat(newValue);
                     updateTask(
                       task.fileName,
-                      { offset: Math.max(0, task.offset - 0.05) },
+                      { offset: Math.min(2, Math.max(0, numericValue)) },
                     );
                   }}
-                >
-                  <span>
-                  -
-                  </span>
-                </button>
-                <button
-                  className="task-list__button"
-                  disabled={busy}
-                  onClick={() => {
-                    updateTask(
-                      task.fileName,
-                      { offset: Math.min(2, task.offset + 0.05) },
-                    );
-                  }}
-                >
-                  <span>
-                  +
-                  </span>
-                </button>
+                />
               </>
             )}
           </span>
