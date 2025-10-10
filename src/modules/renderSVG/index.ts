@@ -43,13 +43,13 @@ export const getColor = (taskType: TaskType, flip: boolean): string => {
 
 export const getGridStrokeProps = (index?: number): StrokeProps => {
   const iMod = index ? index % 10 : 0;
-  const isOrigin = ((index || 0) * SVG_SCALE) === SVG_SCALED_VIEWBOX_OFFSET;
+  const isOrigin = !index;
   const isStrong = (iMod * SVG_SCALE) === SVG_SCALED_VIEWBOX_OFFSET;
 
   if (isOrigin) {
     return {
-      stroke: 'rgba(0, 0, 0, 0.7)',
-      strokeWidth: (0.0125 * SVG_SCALE).toFixed(2),
+      stroke: 'rgba(0, 0, 0, 0.6)',
+      strokeWidth: (0.025 * SVG_SCALE).toFixed(2),
     };
   }
 

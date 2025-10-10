@@ -3,7 +3,6 @@ import {
   getGridStrokeProps,
   getSVGBounds,
   SVG_SCALE,
-  SVG_SCALED_VIEWBOX_OFFSET,
 } from '@/modules/renderSVG';
 
 export function Grid() {
@@ -17,20 +16,22 @@ export function Grid() {
 
   const numXLines = Math.floor((right - left) / SVG_SCALE) + 1;
   const numYLines = Math.floor((bottom - top) / SVG_SCALE) + 1;
+  const lineXOffset = left / SVG_SCALE;
+  const lineYOffset = top / SVG_SCALE;
 
   return (
     <>
       <g>
         <circle
-          cx={left + SVG_SCALED_VIEWBOX_OFFSET}
-          cy={top + SVG_SCALED_VIEWBOX_OFFSET}
+          cx={0}
+          cy={0}
           r={0.5 * SVG_SCALE}
           fill="none"
           {...getGridStrokeProps()}
         />
         <text
-          x={left + SVG_SCALED_VIEWBOX_OFFSET + (0.3 * SVG_SCALE)}
-          y={top + SVG_SCALED_VIEWBOX_OFFSET + (0.9 * SVG_SCALE)}
+          x={0.3 * SVG_SCALE}
+          y={0.9 * SVG_SCALE}
           fill="rgba(0, 0, 0, 0.4)"
           style={{ fontSize: `${0.5 * SVG_SCALE}px` }}
         >
@@ -42,23 +43,25 @@ export function Grid() {
           <line
             className={`l-${left} i-${i}`}
             key={`x-${i}`}
+            id={`x-${i}|${(left / SVG_SCALE)}`}
             x1={(i * SVG_SCALE) + left}
             y1={top}
             x2={(i * SVG_SCALE) + left}
             y2={bottom}
-            {...getGridStrokeProps(i)}
+            {...getGridStrokeProps(i + lineXOffset)}
           />
         ))}
       </g>
       <g>
         {Array.from({ length: numYLines }, (_, i) => (
           <line
-            key={`y-${i}`}
+            key={`y-${i}-${(top / SVG_SCALE)}`}
+            id={`y-${i}|${(top / SVG_SCALE)}`}
             x1={left}
             y1={(i * SVG_SCALE) + top}
             x2={right}
             y2={(i * SVG_SCALE) + top}
-            {...getGridStrokeProps(i)}
+            {...getGridStrokeProps(i + lineYOffset)}
           />
         ))}
       </g>
