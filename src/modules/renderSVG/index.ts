@@ -81,8 +81,8 @@ export const getViewBox = (bounds: IntRect): string => {
   const svgBounds = getSVGBounds(bounds);
   const x = svgBounds.left;
   const y = svgBounds.top;
-  const w = (svgBounds.right - svgBounds.left);
-  const h = (svgBounds.bottom - svgBounds.top);
+  const w = svgBounds.right - svgBounds.left;
+  const h = svgBounds.bottom - svgBounds.top;
 
   return [x, y, w, h].join(' ');
 };
