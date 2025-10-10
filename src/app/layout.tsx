@@ -1,14 +1,20 @@
+import { NextIntlClientProvider } from 'next-intl';
 import { PropsWithChildren } from 'react';
 import { MainProvider } from '@/components/MainContext';
 import './style.scss';
 
-export default function RootLayout({ children }: PropsWithChildren) {
+const locale = 'en';
+
+export default async function RootLayout({ children }: PropsWithChildren) {
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body>
-        <MainProvider>
-          {children}
-        </MainProvider>
+        <NextIntlClientProvider>
+          <MainProvider>
+            {children}
+          </MainProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

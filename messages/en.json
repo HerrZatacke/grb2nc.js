@@ -1,0 +1,21 @@
+{
+  "FileInput": {
+    "openFiles": "Open File(s)",
+    "watchFiles": "{activeHandles, plural, =0 {Watch file(s)} =1 {Watching 1 file} other {Watching # files}} "
+  },
+  "OperationForm": {
+    "fields": {
+      "originOffsetX": "Origin X-Offset",
+      "originOffsetY": "Origin Y-Offset",
+      "safeHeight": "Safe height",
+      "clearanceHeight": "Clearance height",
+      "workHeight": "Work height",
+      "cutDepth": "Cut depth",
+      "stepDepth": "Step depth",
+      "feedRateXY": "Feedrate X/Y",
+      "plungeSpeed": "Plunge speed",
+      "retractSpeed": "Retract speed",
+      "spindleSpeed": "Spindle speed"
+    }
+  }
+}

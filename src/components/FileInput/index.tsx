@@ -1,14 +1,16 @@
 'use client';
 
+import './styles.scss';
 import clsx from 'clsx';
+import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 import { useMainContext } from '@/components/MainContext';
 import { useFileReader } from '@/hooks/useFileReader.ts';
-import './styles.scss';
 
 
 export default function FileInput() {
   const { activeHandles } = useMainContext();
+  const t = useTranslations('FileInput');
 
   const {
     canUseFilePicker,
@@ -33,11 +35,11 @@ export default function FileInput() {
           onClick={requestInputHandle}
           disabled={busy}
         >
-          { activeHandles ? `Watching ${activeHandles} File(s)` : 'Watch File(s)'}
+          {t('watchFiles', { activeHandles })}
         </button>
       ) : (
         <label className={buttonClass}>
-          Open File(s)
+          {t('openFiles')}
           <input
             className="file-input__input"
             type="file"

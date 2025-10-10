@@ -1,11 +1,12 @@
 'use client';
 
-import {useCallback} from 'react';
-import {InputField} from '@/components/InputField';
-import {useMainContext} from '@/components/MainContext';
-import {MachiningParams} from '@/types/machining.ts';
 import './styles.scss';
-import {TaskType} from "@/types/tasks.ts";
+import { useTranslations } from 'next-intl';
+import { useCallback } from 'react';
+import { InputField } from '@/components/InputField';
+import { useMainContext } from '@/components/MainContext';
+import { MachiningParams } from '@/types/machining.ts';
+import { TaskType } from '@/types/tasks.ts';
 
 const numberFieldNames: (keyof MachiningParams)[] = [
   'originOffsetX',
@@ -29,6 +30,7 @@ export default function OperationForm() {
     updateMachiningOperationParam,
   } = useMainContext();
   const operationValues = operationForm && machiningOperations?.[operationForm] || null;
+  const t = useTranslations('OperationForm');
 
   const changeHandler = useCallback((fieldName: keyof MachiningParams) => (value: string) => {
     if (!operationForm) { return; }
@@ -49,7 +51,7 @@ export default function OperationForm() {
         return (
           <InputField
             key={fieldName}
-            label={fieldName}
+            label={t(`fields.${fieldName}`)}
             fieldName={fieldName}
             value={operationValues[fieldName]}
             onChange={changeHandler(fieldName)}

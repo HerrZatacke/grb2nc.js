@@ -30,6 +30,7 @@
     "eslint-config-next": "15.5.4",
     "file-saver": "^2.0.5",
     "next": "15.5.4",
+    "next-intl": "^4.3.12",
     "ohash": "^2.0.11",
     "react": "19.1.0",
     "react-dom": "19.1.0",

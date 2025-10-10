@@ -1,10 +1,10 @@
 'use client';
 
+import './styles.scss';
+import { InputField } from '@/components/InputField';
 import { useMainContext } from '@/components/MainContext';
 import { useDownloadNC } from '@/hooks/useDownloadNC.ts';
-import './styles.scss';
 import { TaskType } from '@/types/tasks.ts';
-import {InputField} from "@/components/InputField";
 
 const typeIcon = (type: TaskType): string => {
   switch (type) {
