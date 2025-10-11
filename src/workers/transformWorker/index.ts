@@ -9,10 +9,10 @@ import { RenderedTask, TaskType, TaskWithPolygons, Units } from '@/types/tasks.t
 import { defaultBounds } from '@/workers/transformWorker/functions/defaultBounds.ts';
 import { renderTask } from '@/workers/transformWorker/functions/renderTask.ts';
 import {
+  ErrorCallback,
   ITansformWorkerApi,
   ProgressAddEstimate,
   ProgressCallback,
-  ErrorCallback,
   ProgressTick,
   TransformWorkerParams,
   TransformWorkerResult,
