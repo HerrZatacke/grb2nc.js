@@ -1,6 +1,7 @@
-import { IntRect } from 'clipper-lib';
+import type { CircleShape } from '@hpcreery/tracespace-plotter';
+import type { IntRect } from 'clipper-lib';
 import { transformer } from '@/modules/transformer';
-import { Point, Polygon } from '@/types/geo';
+import type { Point, Polygon } from '@/types/geo';
 import { TaskType } from '@/types/tasks.ts';
 
 interface StrokeProps {
@@ -12,6 +13,10 @@ export const SVG_SCALE = parseInt(process.env.NEXT_PUBLIC_SVG_SCALE || '0', 10);
 export const SVG_VIEWBOX_OFFSET = 4;
 export const SVG_SCALED_VIEWBOX_OFFSET = SVG_VIEWBOX_OFFSET * SVG_SCALE;
 
+const svgPoint = (lm: 'L'|'M', x: number, y: number): string => {
+  return `${lm}${x.toFixed(2)} ${y.toFixed(2)}`;
+};
+
 export const polygonsToSVGPaths = (polygons: Polygon[], precision: number): string[] => {
   return polygons.reduce((path: string[], points: Point[]): string[] => {
     return [
@@ -22,12 +27,25 @@ export const polygonsToSVGPaths = (polygons: Polygon[], precision: number): stri
         const x = SVG_SCALE * pt.X / precision;
         const y = SVG_SCALE * pt.Y / precision;
 
-        return `${lm}${x.toFixed(2)} ${y.toFixed(2)}`;
+        return svgPoint(lm, x, y);
       }).join(' '),
     ];
   }, []);
 };
 
+
+export const circleShapeToSVGPath = (circleShape: CircleShape): string => {
+  const x = SVG_SCALE * circleShape.cx;
+  const y = SVG_SCALE * circleShape.cy;
+  const r = SVG_SCALE * circleShape.r;
+
+  return [
+    svgPoint('M', x - r, y),
+    svgPoint('L', x + r, y),
+    svgPoint('M', x, y - r),
+    svgPoint('L', x, y + r),
+  ].join(' ');
+};
 
 export const getColor = (taskType: TaskType, flip: boolean): string => {
   if (taskType === TaskType.EDGE_CUT) {
@@ -98,6 +116,7 @@ export const getOffsetStroke = (type: TaskType): string => {
     case TaskType.ISOLATION:
       return (0.015 * SVG_SCALE).toFixed(2);
     case TaskType.DRILL:
+      return (0.025 * SVG_SCALE).toFixed(2);
     default:
       return '0';
   }

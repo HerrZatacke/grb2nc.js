@@ -1,6 +1,7 @@
-import { getAreaStroke, getColor, getOffsetStroke, polygonsToSVGPaths } from '@/modules/renderSVG';
+import type { CircleShape } from '@hpcreery/tracespace-plotter';
+import { circleShapeToSVGPath, getAreaStroke, getColor, getOffsetStroke, polygonsToSVGPaths } from '@/modules/renderSVG';
 import { Polygon } from '@/types/geo';
-import { RenderedTask, SVGPathProps, TaskWithPolygons } from '@/types/tasks.ts';
+import { type RenderedTask, type SVGPathProps, TaskType, type TaskWithPolygons } from '@/types/tasks.ts';
 import { createOffsetPaths } from '@/workers/transformWorker/functions/createOffsetPaths.ts';
 import { RenderTaskParams } from '@/workers/transformWorker/functions/types.ts';
 
@@ -15,6 +16,7 @@ export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWit
 
   const {
     polygons,
+    drills,
     type,
     flip,
     steps,
@@ -60,18 +62,28 @@ export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWit
   const clipperOffsetDuration = performance.now() - clipperOffsetStart;
   const pathOffsetStart = performance.now();
 
-  svgPathProps.push(...offsetPaths.map((offsetPath: Polygon[]) => {
-    const pathSegments = polygonsToSVGPaths(offsetPath, scale);
-    return pathSegments.map((pathSegment): SVGPathProps => {
-      return {
-        path: pathSegment,
-        fill: 'none',
-        stroke: `rgba(${color}, 1)`,
-        strokeWidth: getOffsetStroke(type),
-        hide: hidePaths,
-      };
-    });
-  }).flat());
+  if (type === TaskType.DRILL) {
+    svgPathProps.push(...drills.map((circleShape: CircleShape) => ({
+      path: circleShapeToSVGPath(circleShape),
+      fill: 'none',
+      stroke: `rgba(${color}, 1)`,
+      strokeWidth: getOffsetStroke(type),
+      hide: hidePaths,
+    })));
+  } else {
+    svgPathProps.push(...offsetPaths.map((offsetPath: Polygon[]) => {
+      const pathSegments = polygonsToSVGPaths(offsetPath, scale);
+      return pathSegments.map((pathSegment): SVGPathProps => {
+        return {
+          path: pathSegment,
+          fill: 'none',
+          stroke: `rgba(${color}, 1)`,
+          strokeWidth: getOffsetStroke(type),
+          hide: hidePaths,
+        };
+      });
+    }).flat());
+  }
 
   await progressTick();
 
