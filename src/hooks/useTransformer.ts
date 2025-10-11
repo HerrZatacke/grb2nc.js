@@ -45,8 +45,6 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
     const handleResult = ({ bounds, renderedTasks, units }: TransformWorkerResult) => {
       // console.info(timings.join('\n'));
 
-      console.log(bounds);
-
       setGlobalBounds({
         left: Math.min(bounds.left, 0),
         top: Math.min(bounds.top, 0),
