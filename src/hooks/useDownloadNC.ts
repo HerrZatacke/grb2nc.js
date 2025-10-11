@@ -21,6 +21,7 @@ export const useDownloadNC = (): UseDownloadNC => {
       flip: renderedTask.flip ? Flip.Y : Flip.BOTH,
       params: machiningOperations[renderedTask.type],
       scale: transformer.getScale(),
+      description: `${renderedTask.type} - "${renderedTask.fileName}"`,
     });
 
     saveAs(new Blob([gCode]), `${renderedTask.fileName}.nc`);
