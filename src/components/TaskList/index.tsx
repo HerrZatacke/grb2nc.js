@@ -33,115 +33,99 @@ export default function TaskList() {
             key={fileName}
             className="task-list__entry"
           >
-            <button
-              className="task-list__button"
-              disabled={busy}
-              onClick={() => {
-                updateTask(
-                  task.fileName,
-                  { hideAreas: !task.hideAreas },
-                );
-              }}
-            >
+            <div className="task-list__line">
               <span>
-              {task.hideAreas ? '✖️' : '👁️'}
+                {typeIcon(type)}
               </span>
-            </button>
-            <button
-              className="task-list__button"
-              disabled={busy}
-              onClick={() => {
-                updateTask(
-                  task.fileName,
-                  { hidePaths: !task.hidePaths },
-                );
-              }}
-            >
               <span>
-              {task.hidePaths ? '✖️' : '👁️'}
+                {fileName}
               </span>
-            </button>
-            <button
-              className="task-list__button"
-              disabled={busy}
-              onClick={() => {
-                downloadNCCode(task.fileName);
-              }}
-            >
-              <span>
-              💾
-              </span>
-            </button>
-            <button
-              className="task-list__button"
-              disabled={busy}
-              onClick={() => {
-                setOprtationForm(task.type);
-              }}
-            >
-              <span>
-              ✏️
-              </span>
-            </button>
-            <span>
-              {typeIcon(type)}
-            </span>
-            <span>
-              {fileName}
-            </span>
+            </div>
+            <div className="task-list__line">
+              <button
+                className="task-list__button"
+                disabled={busy}
+                onClick={() => {
+                  updateTask(
+                    task.fileName,
+                    { hideAreas: !task.hideAreas },
+                  );
+                }}
+              >
+                <span>
+                {task.hideAreas ? '✖️' : '👁️'}
+                </span>
+              </button>
+              <button
+                className="task-list__button"
+                disabled={busy}
+                onClick={() => {
+                  updateTask(
+                    task.fileName,
+                    { hidePaths: !task.hidePaths },
+                  );
+                }}
+              >
+                <span>
+                {task.hidePaths ? '✖️' : '👁️'}
+                </span>
+              </button>
+              <button
+                className="task-list__button"
+                disabled={busy}
+                onClick={() => {
+                  downloadNCCode(task.fileName);
+                }}
+              >
+                <span>
+                💾
+                </span>
+              </button>
+              <button
+                className="task-list__button"
+                disabled={busy}
+                onClick={() => {
+                  setOprtationForm(task.type);
+                }}
+              >
+                <span>
+                ✏️
+                </span>
+              </button>
+            </div>
             {type === TaskType.ISOLATION && (
-              <>
-                <code>
-                  {`${steps.toFixed(0)} steps`}
-                </code>
-                <button
-                  className="task-list__button"
-                  disabled={busy}
-                  onClick={() => {
-                    updateTask(
-                      task.fileName,
-                      { steps: Math.max(0, task.steps - 1) },
-                    );
-                  }}
-                >
-                  <span>
-                  -
-                  </span>
-                </button>
-                <button
-                  className="task-list__button"
-                  disabled={busy}
-                  onClick={() => {
-                    updateTask(
-                      task.fileName,
-                      { steps: Math.min(10, task.steps + 1) },
-                    );
-                  }}
-                >
-                  <span>
-                  +
-                  </span>
-                </button>
-              </>
+              <InputField
+                label={`${steps} steps`}
+                fieldName={`${type}-${index}-steps`}
+                value={steps.toFixed(0)}
+                precision={0}
+                step={1}
+                unit=""
+                onChange={(newValue) => {
+                  const numericValue = parseInt(newValue, 10);
+                  updateTask(
+                    task.fileName,
+                    { steps: Math.min(10, Math.max(0, numericValue)) },
+                  );
+                }}
+              />
             )}
             {type !== TaskType.DRILL && (
-              <>
-                <InputField
-                  label="Offset"
-                  fieldName={`${type}-${index}-offset`}
-                  value={offset.toFixed(2)}
-                  precision={2}
-                  step={0.01}
-                  unit={globalUnits}
-                  onChange={(newValue) => {
-                    const numericValue = parseFloat(newValue);
-                    updateTask(
-                      task.fileName,
-                      { offset: Math.min(2, Math.max(0, numericValue)) },
-                    );
-                  }}
-                />
-              </>
+              <InputField
+                label="Offset"
+                fieldName={`${type}-${index}-offset`}
+                value={offset.toFixed(2)}
+                precision={2}
+                step={0.01}
+                unit={globalUnits}
+                onChange={(newValue) => {
+                  const numericValue = parseFloat(newValue);
+                  updateTask(
+                    task.fileName,
+                    { offset: Math.min(2, Math.max(0, numericValue)) },
+                  );
+                }}
+              />
             )}
           </span>
         );

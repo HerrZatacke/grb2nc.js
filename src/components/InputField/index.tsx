@@ -1,3 +1,4 @@
+import './styles.scss';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 
 export interface Props {
@@ -47,19 +48,27 @@ export function InputField({ value, fieldName, onChange, label, precision, unit,
   }, [cleanValue, value]);
 
   return (
-    <div>
-      <label htmlFor={`field-${fieldName}`}>
-        <span>{label}</span>
+    <div className="input-field">
+      <label
+        htmlFor={`field-${fieldName}`}
+        className="input-field__label"
+      >
+        {label}
       </label>
-      <input
-        id={`field-${fieldName}`}
-        value={intermediateValue}
-        onChange={changeHandler}
-        onBlur={blurHandler}
-      />
-      <span>{unit}</span>
-      <button onClick={() => incDec(true)}>+</button>
-      <button onClick={() => incDec(false)}>-</button>
+      <div
+        className="input-field__input-wrapper"
+      >
+        <input
+          className="input-field__input"
+          id={`field-${fieldName}`}
+          value={intermediateValue}
+          onChange={changeHandler}
+          onBlur={blurHandler}
+        />
+        <span className="input-field__units">{unit}</span>
+      </div>
+      <button className="input-field__button" onClick={() => incDec(true)}>➕</button>
+      <button className="input-field__button" onClick={() => incDec(false)}>➖</button>
     </div>
   );
 }
