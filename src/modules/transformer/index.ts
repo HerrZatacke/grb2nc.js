@@ -1,5 +1,5 @@
-import { type ImagePath, type ImageRegion, type ImageTree, type Shape } from '@hpcreery/tracespace-plotter';
-import { Clipper, PolyType, ClipType, PolyFillType } from 'clipper-lib';
+import type { CircleShape, ImagePath, ImageRegion, ImageTree, Shape } from '@hpcreery/tracespace-plotter';
+import { Clipper, ClipType, PolyFillType, PolyType } from 'clipper-lib';
 import { mergePolyline } from '@/modules/transformer/mergePolyline';
 import { Point, type Polygon } from '@/types/geo';
 import { TaskType } from '@/types/tasks.ts';
@@ -10,10 +10,15 @@ const PI_2 = Math.PI / 2;
 const PI_1_5 = 1.5 * Math.PI;
 const PI2 = 2 * Math.PI;
 
+interface TransformerResult {
+  polygons: Polygon[];
+  drills: CircleShape[];
+}
 
 class Transformer {
   private clipper: Clipper = new Clipper();
   private edgePolygons: Polygon[] = [];
+  private drillCircles: CircleShape[] = [];
   private scale = 0;
   private minimumRadius = 0;
   private precision = 10000;
@@ -23,18 +28,17 @@ class Transformer {
     this.minimumRadius = minimumRadius;
   }
 
-  run(plotData: ImageTree, taskType: TaskType): Polygon[] {
+  run(plotData: ImageTree, taskType: TaskType): TransformerResult {
     this.clipper.Clear();
     this.edgePolygons = [];
-
-    // const start = Date.now();
+    this.drillCircles = [];
 
     plotData.children.forEach(child => {
       switch (child.type) {
 
         // Pads and something near the pads....
         case 'imageShape':
-          this.drawShape(child.shape);
+          this.drawShape(child.shape, taskType);
           break;
 
         // pcb traces
@@ -62,7 +66,7 @@ class Transformer {
     return this.finalize(taskType);
   }
 
-  drawShape(shape: Shape /* , taskType: TaskType*/) {
+  drawShape(shape: Shape, taskType: TaskType) {
     switch (shape.type) {
       case 'rectangle': {
         const x = shape.x;
@@ -89,6 +93,10 @@ class Transformer {
       }
 
       case 'circle': {
+        if (taskType === TaskType.DRILL) {
+          this.drillCircles.push(shape);
+        }
+
         const cx = shape.cx;
         const cy = shape.cy;
         const r = shape.r;
@@ -122,7 +130,7 @@ class Transformer {
 
       case 'layeredShape': {
         if (shape.shapes) {
-          shape.shapes.forEach(subShape => this.drawShape(subShape));
+          shape.shapes.forEach(subShape => this.drawShape(subShape, taskType));
         }
 
         break;
@@ -195,7 +203,6 @@ class Transformer {
             ...arc,
             { X: x2, Y: y2 },
           ];
-
 
           switch (taskType) {
             case TaskType.ISOLATION: {
@@ -274,7 +281,7 @@ class Transformer {
     this.clipper.AddPath(scaledPolygon, PolyType.ptSubject, true);
   }
 
-  private finalize(taskType: TaskType): Polygon[] {
+  private finalize(taskType: TaskType): TransformerResult {
     const traceSolution: Polygon[] = [];
     const pft: PolyFillType = taskType === TaskType.EDGE_CUT ? PolyFillType.pftEvenOdd : PolyFillType.pftNonZero;
     // const pft: PolyFillType = PolyFillType.pftEvenOdd;
@@ -287,7 +294,10 @@ class Transformer {
       pft,
     );
 
-    return traceSolution.map(closePath);
+    return {
+      polygons: traceSolution.map(closePath),
+      drills: this.drillCircles,
+    };
   }
 
   getScale(): number {

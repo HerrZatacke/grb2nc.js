@@ -1,3 +1,4 @@
+import { CircleShape } from '@hpcreery/tracespace-plotter';
 import { Polygon } from '@/types/geo';
 
 export enum TaskType {
@@ -25,6 +26,7 @@ export type Task = {
 
 export interface TaskWithPolygons extends Task {
   polygons: Polygon[];
+  drills: CircleShape[];
   units: Units;
 }
 

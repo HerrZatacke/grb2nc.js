@@ -78,11 +78,11 @@ class TansformWorkerApi implements ITansformWorkerApi {
 
           const imageTree = plot(syntaxTree);
 
-          const polygons = transformer.run(imageTree, task.type);
+          const result = transformer.run(imageTree, task.type);
 
           return {
             ...task,
-            polygons,
+            ...result,
             units,
           };
         } catch (error) {
