@@ -6,7 +6,6 @@ import { hash as ohash } from 'ohash';
 import { delay } from '@/modules/delay';
 import { transformer } from '@/modules/transformer';
 import { RenderedTask, TaskType, TaskWithPolygons, Units } from '@/types/tasks.ts';
-import { closePath } from '@/workers/transformWorker/functions/closePath.ts';
 import { defaultBounds } from '@/workers/transformWorker/functions/defaultBounds.ts';
 import { renderTask } from '@/workers/transformWorker/functions/renderTask.ts';
 import {
@@ -79,9 +78,7 @@ class TansformWorkerApi implements ITansformWorkerApi {
 
           const imageTree = plot(syntaxTree);
 
-          transformer.run(imageTree, task.type);
-
-          const polygons = transformer.result(task.type).map(closePath);
+          const polygons = transformer.run(imageTree, task.type);
 
           return {
             ...task,

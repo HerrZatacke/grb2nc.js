@@ -1,8 +1,9 @@
 import { type ImagePath, type ImageRegion, type ImageTree, type Shape } from '@hpcreery/tracespace-plotter';
 import { Clipper, PolyType, ClipType, PolyFillType } from 'clipper-lib';
+import { mergePolyline } from '@/modules/transformer/mergePolyline';
 import { Point, type Polygon } from '@/types/geo';
 import { TaskType } from '@/types/tasks.ts';
-import { mergePolyline } from './mergePolyline';
+import { closePath } from '@/workers/transformWorker/functions/closePath.ts';
 
 const PI = Math.PI;
 const PI_2 = Math.PI / 2;
@@ -22,7 +23,7 @@ class Transformer {
     this.minimumRadius = minimumRadius;
   }
 
-  run(plotData: ImageTree, taskType: TaskType) {
+  run(plotData: ImageTree, taskType: TaskType): Polygon[] {
     this.clipper.Clear();
     this.edgePolygons = [];
 
@@ -58,8 +59,7 @@ class Transformer {
         });
     }
 
-    // const duration = Date.now() - start;
-    // console.log(`Transforming gerber to ${taskType} polygons took ${duration}ms`);
+    return this.finalize(taskType);
   }
 
   drawShape(shape: Shape /* , taskType: TaskType*/) {
@@ -274,7 +274,7 @@ class Transformer {
     this.clipper.AddPath(scaledPolygon, PolyType.ptSubject, true);
   }
 
-  result(taskType: TaskType): Polygon[] {
+  private finalize(taskType: TaskType): Polygon[] {
     const traceSolution: Polygon[] = [];
     const pft: PolyFillType = taskType === TaskType.EDGE_CUT ? PolyFillType.pftEvenOdd : PolyFillType.pftNonZero;
     // const pft: PolyFillType = PolyFillType.pftEvenOdd;
@@ -287,7 +287,7 @@ class Transformer {
       pft,
     );
 
-    return traceSolution;
+    return traceSolution.map(closePath);
   }
 
   getScale(): number {
