@@ -18,7 +18,6 @@ const numberFieldNames: (keyof MachiningParams)[] = [
   'stepDepth',
   'feedRateXY',
   'plungeSpeed',
-  'retractSpeed',
   'spindleSpeed',
 ];
 

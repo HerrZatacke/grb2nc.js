@@ -8,14 +8,13 @@ export const machiningDefaultParams = (taskType: TaskType): MachiningParams => {
         units: Units.MILLIMETERS,
         originOffsetX: '0',
         originOffsetY: '0',
-        safeHeight: '1.5',
-        clearanceHeight: '0.5',
+        safeHeight: '30.0',
+        clearanceHeight: '1.0',
         workHeight: '0',
         cutDepth: '-1.8',
-        stepDepth: '0.5', // peck depth
-        feedRateXY: '0',
-        plungeSpeed: '80',
-        retractSpeed: '300',
+        stepDepth: '1.0', // peck depth
+        feedRateXY: '0', // not required/no milling
+        plungeSpeed: '25',
         spindleSpeed: '10000',
       };
 
@@ -24,15 +23,14 @@ export const machiningDefaultParams = (taskType: TaskType): MachiningParams => {
         units: Units.MILLIMETERS,
         originOffsetX: '0',
         originOffsetY: '0',
-        safeHeight: '1.0',
-        clearanceHeight: '0.3',
+        safeHeight: '30.0',
+        clearanceHeight: '1.0',
         workHeight: '0',
-        cutDepth: '-0.1',
+        cutDepth: '-0.1', // copper thickness
         stepDepth: '0.1',
-        feedRateXY: '150',
-        plungeSpeed: '100',
-        retractSpeed: '300',
-        spindleSpeed: '16000',
+        feedRateXY: '70',
+        plungeSpeed: '70',
+        spindleSpeed: '10000',
       };
 
     case TaskType.EDGE_CUT:
@@ -40,15 +38,14 @@ export const machiningDefaultParams = (taskType: TaskType): MachiningParams => {
         units: Units.MILLIMETERS,
         originOffsetX: '0',
         originOffsetY: '0',
-        safeHeight: '2.0',
-        clearanceHeight: '0.5',
+        safeHeight: '30.0',
+        clearanceHeight: '1.0',
         workHeight: '0',
         cutDepth: '-1.8',
-        stepDepth: '0.6', // pass depth
-        feedRateXY: '300',
-        plungeSpeed: '100',
-        retractSpeed: '300',
-        spindleSpeed: '14000',
+        stepDepth: '0.9', // pass depth
+        feedRateXY: '60',
+        plungeSpeed: '60',
+        spindleSpeed: '10000',
       };
 
     default:

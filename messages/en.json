@@ -14,7 +14,6 @@
       "stepDepth": "Step depth",
       "feedRateXY": "Feedrate X/Y",
       "plungeSpeed": "Plunge speed",
-      "retractSpeed": "Retract speed",
       "spindleSpeed": "Spindle speed"
     }
   }

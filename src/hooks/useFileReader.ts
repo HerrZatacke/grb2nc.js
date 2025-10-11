@@ -13,7 +13,7 @@ export const getSteps = (type: TaskType): number => {
     case TaskType.EDGE_CUT:
       return 1;
     case TaskType.ISOLATION:
-      return 4;
+      return 1;
     case TaskType.DRILL:
       return 0;
   }
@@ -22,12 +22,12 @@ export const getSteps = (type: TaskType): number => {
 export const getOffset = (type: TaskType): number => {
   switch (type) {
     case TaskType.EDGE_CUT:
-      return 1;
+      return 1.5; // assuming a 3.0mm wide cutter
     case TaskType.ISOLATION:
-      return 0.1;
+      return 0.05; // assuming a 0.1mm wide mill
     case TaskType.DRILL:
     default:
-      return 0;
+      return 0; // not required
   }
 };
 
@@ -88,16 +88,18 @@ export const useFileReader = (): UseFileReader => {
     let type: TaskType;
     let flip: boolean;
 
+    // for now, let's flip everything but the top layer, because they can be milled at the same time as the bottom copper
     if (ext === 'drl') {
       type = TaskType.DRILL;
-      flip = false;
+      flip = true;
     } else if (name.includes('edge')) {
       type = TaskType.EDGE_CUT;
-      flip = false;
+      flip = true;
     } else if (name.includes('b_cu') || name.includes('bottom')) {
       type = TaskType.ISOLATION;
       flip = true;
     } else {
+      // only the top layer does not get flipped
       type = TaskType.ISOLATION;
       flip = false;
     }

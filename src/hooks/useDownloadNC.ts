@@ -15,12 +15,14 @@ export const useDownloadNC = (): UseDownloadNC => {
 
     if (!renderedTask) { return; }
 
-    const gCode = generateGCode(
-      renderedTask.offsetPaths.flat(1),
-      transformer.getScale(),
-      machiningOperations[renderedTask.type],
-      renderedTask.flip ? Flip.X : Flip.NONE,
-    );
+    const gCode = generateGCode({
+      contours: renderedTask.offsetPaths.flat(1),
+      drills: renderedTask.drills,
+      flip: renderedTask.flip ? Flip.Y : Flip.BOTH,
+      params: machiningOperations[renderedTask.type],
+      scale: transformer.getScale(),
+    });
+
     saveAs(new Blob([gCode]), `${renderedTask.fileName}.nc`);
   }, [machiningOperations, renderedTasks]);
 

@@ -11,7 +11,6 @@ export interface MachiningParams {
   stepDepth: string; // Depth increment per pass/peck
   feedRateXY: string; // XY move feedrate
   plungeSpeed: string; // Z plunge feedrate
-  retractSpeed: string; // Z retract feedrate
   spindleSpeed: string; // Spindle RPM
 }
 
