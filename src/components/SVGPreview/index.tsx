@@ -13,7 +13,11 @@ export default function SVGPreview() {
 
   return (
     <div className="svg-preview">
-      <TransformWrapper initialScale={1}>
+      <TransformWrapper
+        initialScale={1}
+        minScale={0.25}
+        maxScale={10}
+      >
         <TransformComponent>
           <svg className="svg-preview__svg" viewBox={viewBox}>
             <Grid />
