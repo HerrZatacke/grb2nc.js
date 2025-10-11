@@ -1,7 +1,7 @@
 import { saveAs } from 'file-saver';
 import { useCallback } from 'react';
 import { useMainContext } from '@/components/MainContext';
-import { generateGCode } from '@/modules/machining/generateGCode.ts';
+import { Flip, generateGCode } from '@/modules/machining/generateGCode.ts';
 import { transformer } from '@/modules/transformer';
 
 interface UseDownloadNC {
@@ -15,12 +15,15 @@ export const useDownloadNC = (): UseDownloadNC => {
 
     if (!renderedTask) { return; }
 
+    console.log(renderedTask.flip);
+
     const gCode = generateGCode(
       renderedTask.offsetPaths.flat(1),
       transformer.getScale(),
       machiningOperations[renderedTask.type],
+      renderedTask.flip ? Flip.X : Flip.NONE,
     );
-    saveAs(new Blob([gCode]), 'gcode.nc');
+    saveAs(new Blob([gCode]), `${renderedTask.fileName}.nc`);
   }, [machiningOperations, renderedTasks]);
 
   return {

@@ -3,7 +3,14 @@ import { Polygon } from '@/types/geo';
 import { MachiningParams } from '@/types/machining.ts';
 import { Units } from '@/types/tasks.ts';
 
-export const generateGCode = (contours: Polygon[], scale: number, params: MachiningParams): string => {
+export enum Flip {
+  NONE = 'none',
+  X = 'x',
+  Y = 'y',
+  BOTH = 'both',
+}
+
+export const generateGCode = (contours: Polygon[], scale: number, params: MachiningParams, flip: Flip): string => {
   const direction = Math.sign(parseFloat(params.cutDepth)) || -1;
   const totalDepth = Math.abs(parseFloat(params.cutDepth));
   const stepDepth = Math.abs(parseFloat(params.stepDepth));
@@ -24,9 +31,14 @@ export const generateGCode = (contours: Polygon[], scale: number, params: Machin
   const safeHeight = parseFloat(params.safeHeight).toFixed(3);
   const clearanceHeight = parseFloat(params.clearanceHeight).toFixed(3);
 
+  const scaleX = flip === Flip.BOTH || flip === Flip.X ? -scale : scale;
+  const scaleY = flip === Flip.BOTH || flip === Flip.Y ? -scale : scale;
+
+  console.log({ scaleX, scaleY });
+
   const toScaledOffsetPoint = (point: IntPoint): string => {
-    const startX = (originOffsetX + (point.X / scale)).toFixed(3);
-    const startY = (originOffsetY + (point.Y / scale)).toFixed(3);
+    const startX = (originOffsetX + (point.X / scaleX)).toFixed(3);
+    const startY = (originOffsetY + (point.Y / scaleY)).toFixed(3);
 
     return `X${startX} Y${startY}`;
   };
