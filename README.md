@@ -1,4 +1,4 @@
 ToDos:
 * MUI
 * Flip Bottom for milling
-* i18n
+* better preview and actual machining for drill
