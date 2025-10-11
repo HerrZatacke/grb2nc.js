@@ -15,8 +15,6 @@ export const useDownloadNC = (): UseDownloadNC => {
 
     if (!renderedTask) { return; }
 
-    console.log(renderedTask.flip);
-
     const gCode = generateGCode(
       renderedTask.offsetPaths.flat(1),
       transformer.getScale(),

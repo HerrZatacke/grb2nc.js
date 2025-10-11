@@ -34,8 +34,6 @@ export const generateGCode = (contours: Polygon[], scale: number, params: Machin
   const scaleX = flip === Flip.BOTH || flip === Flip.X ? -scale : scale;
   const scaleY = flip === Flip.BOTH || flip === Flip.Y ? -scale : scale;
 
-  console.log({ scaleX, scaleY });
-
   const toScaledOffsetPoint = (point: IntPoint): string => {
     const startX = (originOffsetX + (point.X / scaleX)).toFixed(3);
     const startY = (originOffsetY + (point.Y / scaleY)).toFixed(3);
