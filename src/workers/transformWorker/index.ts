@@ -69,28 +69,32 @@ class TansformWorkerApi implements ITansformWorkerApi {
 
     const timings: string[] = [];
 
-    const transformedTasks = tasks.map((task): TaskWithPolygons => {
-      const syntaxTree = parse(task.fileContent);
+    const transformedTasks = tasks
+      .map((task): TaskWithPolygons | null => {
+        try {
+          const syntaxTree = parse(task.fileContent);
 
-      const unitsNode = syntaxTree.children.find(({ type }) => (type === UNITS)) as (UnitsNode | undefined);
-      const units = unitsNode && unitsNode.units === 'in' ? Units.INCHES : Units.MILLIMETERS;
+          const unitsNode = syntaxTree.children.find(({ type }) => (type === UNITS)) as (UnitsNode | undefined);
+          const units = unitsNode && unitsNode.units === 'in' ? Units.INCHES : Units.MILLIMETERS;
 
-      const imageTree = plot(syntaxTree);
+          const imageTree = plot(syntaxTree);
 
-      try {
-        transformer.run(imageTree, task.type);
-      } catch (error) {
-        this.errorCallback((error as Error).message);
-      }
+          transformer.run(imageTree, task.type);
 
-      const polygons = transformer.result(task.type).map(closePath);
+          const polygons = transformer.result(task.type).map(closePath);
 
-      return {
-        ...task,
-        polygons,
-        units,
-      };
-    });
+          return {
+            ...task,
+            polygons,
+            units,
+          };
+        } catch (error) {
+          this.errorCallback((error as Error).message);
+        }
+
+        return null;
+      })
+      .filter(Boolean) as TaskWithPolygons[];
 
     this.progressAddEstimate(3 * transformedTasks.length);
 
