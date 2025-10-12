@@ -14,10 +14,10 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import {type ComponentType, useMemo} from 'react';
-import {UpdateTaskFunction, useMainContext} from '@/components/MainContext';
-import {useDownloadNC} from '@/hooks/useDownloadNC.ts';
-import {Task, TaskType} from '@/types/tasks.ts';
+import { type ComponentType, useMemo } from 'react';
+import { UpdateTaskFunction, useMainContext } from '@/components/MainContext';
+import { useDownloadNC } from '@/hooks/useDownloadNC.ts';
+import { Task, TaskType } from '@/types/tasks.ts';
 
 const typeIcon = (type: TaskType): ComponentType => {
   switch (type) {
