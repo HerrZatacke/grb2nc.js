@@ -17,6 +17,9 @@ export default function SVGPreview() {
         initialScale={1}
         minScale={0.25}
         maxScale={10}
+        limitToBounds={false}
+        centerZoomedOut={false}
+        centerOnInit
       >
         <TransformComponent>
           <svg className="svg-preview__svg" viewBox={viewBox}>
