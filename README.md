@@ -2,7 +2,7 @@
 
 grb2nc is a simple open-source online Gerber to gCode transformer. If you need to create gCode for your PCB prototypes, this tool can help you.
 
-Try the [deployed version on GitHub Pages](http://herrzatacke.github.io/gb-printer-web/grb2nc.js/)
+Try the [deployed version on GitHub Pages](http://herrzatacke.github.io/grb2nc.js/)
 
 ![Application Screenshot](/public/screenshot1.png)
 ![Application Screenshot](/public/screenshot2.png)  
