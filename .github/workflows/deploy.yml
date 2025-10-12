@@ -27,6 +27,8 @@ jobs:
           npm install
 
       - name: Build for pages 📖
+        env:
+          NEXT_PUBLIC_BASE_PATH: /grb2nc.js
         run: |
           npm run build
           touch out/.nojekyll
