@@ -18,6 +18,14 @@ export default function Home() {
         <OperationForm />
         <TaskParamsForm />
       </div>
+      <footer  className="page-footer">
+        <a
+          href="https://github.com/HerrZatacke/grb2nc.js"
+          target="_blank"
+        >
+          grb2nc.js on GitHub
+        </a>
+      </footer>
     </>
   );
 }
