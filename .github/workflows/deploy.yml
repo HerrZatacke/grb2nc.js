@@ -1,0 +1,42 @@
+name: Build 🧱 and Deploy 🛳
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 💳
+        uses: actions/checkout@v4.1.7
+
+      - name: Setup node 💻
+        uses: actions/setup-node@v4.0.1
+        with:
+          node-version: '22.x'
+
+      - name: Install npm dependencies 🔗
+        if: steps.checkTag.outputs.exists == 'false'
+        run: |
+          rm package-lock.json
+          npm cache clear -f
+          npm install
+          rm -rf public/dumps/
+          rm -rf public/env.json
+          mv public/env-pages.json public/env.json
+
+      - name: Build for pages 📖
+        if: steps.checkTag.outputs.exists == 'false'
+        run: |
+          npm run build
+          touch out/.nojekyll
+          mv out out-pages
+
+      - name: Deploy to GitHub-Pages 📖
+        uses: JamesIves/github-pages-deploy-action@v4.6.1
+        if: steps.checkTag.outputs.exists == 'false'
+        with:
+          branch: gh-pages
+          folder: out-pages
