@@ -28,7 +28,6 @@ jobs:
           mv public/env-pages.json public/env.json
 
       - name: Build for pages 📖
-        if: steps.checkTag.outputs.exists == 'false'
         run: |
           npm run build
           touch out/.nojekyll
