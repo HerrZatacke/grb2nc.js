@@ -49,14 +49,14 @@ export const circleShapeToSVGPath = (circleShape: CircleShape): string => {
 
 export const getColor = (taskType: TaskType, flip: boolean): string => {
   if (taskType === TaskType.EDGE_CUT) {
-    return '127,127,127';
+    return 'edgecut';
   }
 
   if (taskType === TaskType.DRILL) {
-    return '63,63,63';
+    return 'drill';
   }
 
-  return flip ? '0,64,255' : '255,64,0';
+  return flip ? 'bottom' : 'top';
 };
 
 export const getGridStrokeProps = (index?: number): StrokeProps => {
@@ -66,20 +66,20 @@ export const getGridStrokeProps = (index?: number): StrokeProps => {
 
   if (isOrigin) {
     return {
-      stroke: 'rgba(0, 0, 0, 0.6)',
+      stroke: 'var(--color-grid-origin)',
       strokeWidth: (0.025 * SVG_SCALE).toFixed(2),
     };
   }
 
   if (isStrong) {
     return {
-      stroke: 'rgba(0, 0, 0, 0.6)',
+      stroke: 'var(--color-grid-strong)',
       strokeWidth: (0.0075 * SVG_SCALE).toFixed(2),
     };
   }
 
   return {
-    stroke: 'rgba(0, 0, 0, 0.3)',
+    stroke: 'var(--color-grid-regular)',
     strokeWidth: (0.005 * SVG_SCALE).toFixed(2),
   };
 };

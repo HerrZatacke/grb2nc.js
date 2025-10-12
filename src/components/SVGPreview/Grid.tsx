@@ -32,7 +32,7 @@ export function Grid() {
         <text
           x={0.3 * SVG_SCALE}
           y={0.9 * SVG_SCALE}
-          fill="rgba(0, 0, 0, 0.4)"
+          fill="var(--color-grid-origin)"
           style={{ fontSize: `${0.5 * SVG_SCALE}px` }}
         >
           {globalUnits}

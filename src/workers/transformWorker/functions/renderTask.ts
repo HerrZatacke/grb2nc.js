@@ -35,8 +35,8 @@ export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWit
 
   const svgPathProps: SVGPathProps[] = [{
     path: svgPaths.join('\n'),
-    fill: `rgba(${color}, 0.025)`,
-    stroke: `rgba(${color}, 0.33)`,
+    fill: `var(--color-fill-${color})`,
+    stroke: `var(--color-stroke-${color})`,
     strokeWidth: getAreaStroke(),
     hide: hideAreas,
   }];
@@ -66,7 +66,7 @@ export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWit
     svgPathProps.push(...drills.map((circleShape: CircleShape) => ({
       path: circleShapeToSVGPath(circleShape),
       fill: 'none',
-      stroke: `rgba(${color}, 1)`,
+      stroke: `var(--color-path-${color})`,
       strokeWidth: getOffsetStroke(type),
       hide: hidePaths,
     })));
@@ -77,7 +77,7 @@ export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWit
         return {
           path: pathSegment,
           fill: 'none',
-          stroke: `rgba(${color}, 1)`,
+          stroke: `var(--color-path-${color})`,
           strokeWidth: getOffsetStroke(type),
           hide: hidePaths,
         };

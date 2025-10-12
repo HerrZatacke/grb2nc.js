@@ -1,0 +1,25 @@
+:root {
+  --fill-opacity: 0.1;
+  --fill-outline-opacity: 0.3;
+  --path-opacity: 1;
+
+  --color-fill-drill: rgba(63, 63, 63, var(--fill-opacity));
+  --color-stroke-drill: rgba(63, 63, 63, var(--fill-outline-opacity));
+  --color-path-drill: rgba(63, 63, 63, var(--path-opacity));
+
+  --color-fill-edgecut: rgba(127, 127, 127, var(--fill-opacity));
+  --color-stroke-edgecut: rgba(127, 127, 127, var(--fill-outline-opacity));
+  --color-path-edgecut: rgba(127, 127, 127, var(--path-opacity));
+
+  --color-fill-top: rgba(255, 64, 0, var(--fill-opacity));
+  --color-stroke-top: rgba(255, 64, 0, var(--fill-outline-opacity));
+  --color-path-top: rgba(255, 64, 0, var(--path-opacity));
+
+  --color-fill-bottom: rgba(0, 64, 255, var(--fill-opacity));
+  --color-stroke-bottom: rgba(0, 64, 255, var(--fill-outline-opacity));
+  --color-path-bottom: rgba(0, 64, 255, var(--path-opacity));
+
+  --color-grid-origin: rgba(127, 127, 127, 0.6);
+  --color-grid-strong: rgba(127, 127, 127, 0.5);
+  --color-grid-regular: rgba(127, 127, 127, 0.4);
+}
