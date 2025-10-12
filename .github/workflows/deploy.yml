@@ -23,9 +23,6 @@ jobs:
           rm package-lock.json
           npm cache clear -f
           npm install
-          rm -rf public/dumps/
-          rm -rf public/env.json
-          mv public/env-pages.json public/env.json
 
       - name: Build for pages 📖
         run: |
