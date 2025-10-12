@@ -12,7 +12,12 @@ export enum Units {
   INCHES = 'in',
 }
 
-export type Task = {
+export interface EditableTask {
+  steps: number;
+  offset: number;
+}
+
+export interface Task extends EditableTask {
   fileName: string;
   fileTime: number;
   fileContent: string;
@@ -20,9 +25,7 @@ export type Task = {
   flip: boolean;
   hidePaths: boolean;
   hideAreas: boolean;
-  steps: number;
-  offset: number;
-};
+}
 
 export interface TaskWithPolygons extends Task {
   polygons: Polygon[];

@@ -4,6 +4,9 @@
     "watchFiles": "{activeHandles, plural, =0 {Watch file(s)} =1 {Watching 1 file} other {Watching # files}} "
   },
   "OperationForm": {
+    "title": "Edit machining operation parameters for {type} operation",
+    "abort": "Cancel",
+    "save": "Save",
     "fields": {
       "originOffsetX": "Origin X-Offset",
       "originOffsetY": "Origin Y-Offset",
@@ -15,6 +18,21 @@
       "feedRateXY": "Feedrate X/Y",
       "plungeSpeed": "Plunge speed",
       "spindleSpeed": "Spindle speed"
+    }
+  },
+  "TaskParamsForm": {
+    "title": "Edit parameters for “{fileName}”",
+    "abort": "Cancel",
+    "save": "Save"
+  },
+  "InputField": {
+    "buttonLabelIncrease": "Maximum: {value}",
+    "buttonLabelDecrease": "Minimum: {value}",
+    "units": {
+      "none": "",
+      "feedRate": "{globalUnits}/min",
+      "rpm": "rpm",
+      "dimension": "{globalUnits}"
     }
   }
 }

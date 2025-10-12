@@ -1,9 +1,7 @@
 'use client';
 
-import './styles.scss';
-import clsx from 'clsx';
+import Button from '@mui/material/Button';
 import { useTranslations } from 'next-intl';
-import { useMemo } from 'react';
 import { useMainContext } from '@/components/MainContext';
 import { useFileReader } from '@/hooks/useFileReader.ts';
 
@@ -20,34 +18,29 @@ export default function FileInput() {
 
   const { busy } = useMainContext();
 
-  const buttonClass = useMemo<string>(() => (
-    clsx('file-input__button', {
-      'file-input__button--disabled': busy,
-    })
-  ), [busy]);
-
   return (
-    <div className="file-input">
+    <div>
       {canUseFilePicker ? (
-        <button
-          type="button"
-          className={buttonClass}
+        <Button
           onClick={requestInputHandle}
           disabled={busy}
         >
           {t('watchFiles', { activeHandles })}
-        </button>
+        </Button>
       ) : (
-        <label className={buttonClass}>
+        <Button
+          component="label"
+          disabled={busy}
+        >
           {t('openFiles')}
           <input
-            className="file-input__input"
             type="file"
             multiple
+            hidden
             disabled={busy}
             onChange={onFileInputChange}
           />
-        </label>
+        </Button>
       )}
     </div>
   );

@@ -1,41 +1,63 @@
 import './styles.scss';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import InputAdornment from '@mui/material/InputAdornment';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import { useTranslations } from 'next-intl';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import { useMainContext } from '@/components/MainContext';
 
 export interface Props {
   label: string;
   fieldName: string;
   value: string;
   precision: number;
-  unit: string;
+  unitTranslationKey: string;
+  min?: number;
+  max?: number;
   step?: number;
   onChange: (newValue: string) => void;
 }
 
-export function InputField({ value, fieldName, onChange, label, precision, unit, step }: Props) {
+
+export function InputField({ value, fieldName, onChange, label, precision, unitTranslationKey, step, min, max }: Props) {
+  const t = useTranslations('InputField');
+  const { globalUnits, busy } = useMainContext();
   const [intermediateValue, setIntermediateValue] = useState<string>(value);
-  const changeHandler = useCallback((ev: ChangeEvent<HTMLInputElement>) => {
+
+  const clampMin = typeof min === 'number' ? min : -Infinity;
+  const clampMax = typeof max === 'number' ? max : Infinity;
+
+  const changeHandler = useCallback((ev: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setIntermediateValue(ev.target.value || '');
   }, []);
+
+  const clampValue = useCallback((unclampedValue: number) => {
+    return Math.min(clampMax, Math.max(clampMin, unclampedValue));
+  }, [clampMax, clampMin]);
 
   const cleanValue = useCallback((dirtyValue: string): string => {
     const numericValue = parseFloat(dirtyValue);
     if (!isNaN(numericValue)) {
-      return numericValue.toFixed(precision);
+      return clampValue(numericValue).toFixed(precision);
     } else {
       return '';
     }
-  }, [precision]);
+  }, [clampValue, precision]);
 
   const incDec = useCallback((inc: boolean) => {
     const incStep = step || 10 ** (1 - precision);
     const numericValue = parseFloat(intermediateValue);
     const direction = inc ? 1 : -1;
-    const newValue = (numericValue + (direction * incStep)).toFixed(precision);
+    const newValue = clampValue(numericValue + (direction * incStep)).toFixed(precision);
     setIntermediateValue(newValue);
     onChange(newValue);
-  }, [intermediateValue, onChange, precision, step]);
+  }, [clampValue, intermediateValue, onChange, precision, step]);
 
-  const blurHandler = useCallback((ev: ChangeEvent<HTMLInputElement>) => {
+  const blurHandler = useCallback((ev: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (ev.target.value) {
       const cleaned = cleanValue(ev.target.value);
       setIntermediateValue(cleaned);
@@ -48,27 +70,50 @@ export function InputField({ value, fieldName, onChange, label, precision, unit,
   }, [cleanValue, value]);
 
   return (
-    <div className="input-field">
-      <label
-        htmlFor={`field-${fieldName}`}
-        className="input-field__label"
-      >
-        {label}
-      </label>
-      <div
-        className="input-field__input-wrapper"
-      >
-        <input
-          className="input-field__input"
-          id={`field-${fieldName}`}
-          value={intermediateValue}
-          onChange={changeHandler}
-          onBlur={blurHandler}
-        />
-        <span className="input-field__units">{unit}</span>
-      </div>
-      <button className="input-field__button" onClick={() => incDec(true)}>➕</button>
-      <button className="input-field__button" onClick={() => incDec(false)}>➖</button>
-    </div>
+    <Stack
+      direction="row"
+      gap={2}
+    >
+      <TextField
+        fullWidth
+        autoComplete="off"
+        disabled={busy}
+        id={`field-${fieldName}`}
+        value={intermediateValue}
+        onChange={changeHandler}
+        onBlur={blurHandler}
+        label={label}
+        size="small"
+        variant="outlined"
+        slotProps={{
+          input: {
+            endAdornment: (
+              <InputAdornment position="end">
+                {t(`units.${unitTranslationKey}`, { globalUnits })}
+              </InputAdornment>
+            ),
+          },
+          htmlInput: {
+            sx: { textAlign: 'right' },
+          },
+        }}
+      />
+      <ButtonGroup>
+        <Button
+          disabled={busy || parseFloat(value) >= clampMax}
+          onClick={() => incDec(true)}
+          title={t('buttonLabelIncrease', { value: clampMax.toString(10) })}
+        >
+          <AddIcon />
+        </Button>
+        <Button
+          disabled={busy || parseFloat(value) <= clampMin}
+          onClick={() => incDec(false)}
+          title={t('buttonLabelDecrease', { value: clampMin.toString(10) })}
+        >
+          <RemoveIcon />
+        </Button>
+      </ButtonGroup>
+    </Stack>
   );
 }

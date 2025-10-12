@@ -1,6 +1,6 @@
 'use client';
 
-import './styles.scss';
+import Alert from '@mui/material/Alert';
 import { useMainContext } from '@/components/MainContext';
 
 export default function Error() {
@@ -11,12 +11,13 @@ export default function Error() {
   return (
     <>
       { globalErrors.map((errorText, index) => (
-        <div
+        <Alert
           key={index}
-          className="global-error"
+          severity="error"
+          variant="filled"
         >
           { errorText }
-        </div>
+        </Alert>
       ))}
     </>
   );

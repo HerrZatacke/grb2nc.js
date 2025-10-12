@@ -1,6 +1,7 @@
 'use client';
 
 import './styles.scss';
+import LinearProgress from '@mui/material/LinearProgress';
 import { useMainContext } from '@/components/MainContext';
 
 export default function Progress() {
@@ -8,12 +9,9 @@ export default function Progress() {
   if (!progress) { return null; }
 
   return (
-    <progress
-      className="progress-bar"
-      value={progress}
-      max={1}
-    >
-      { progress }
-    </progress>
+    <LinearProgress
+      variant="determinate"
+      value={progress * 100}
+    />
   );
 }

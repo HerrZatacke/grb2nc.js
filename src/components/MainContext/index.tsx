@@ -5,14 +5,17 @@ import { createContext, PropsWithChildren, useCallback, useContext, useMemo, use
 import { useLocalStorage } from 'react-storage-complete';
 import { useTransformer } from '@/hooks/useTransformer.ts';
 import { machiningDefaultOperations } from '@/modules/machining/machiningDefaults.ts';
+import { sortTasks } from '@/modules/sortTasks';
 import { MachiningOperations, MachiningParams } from '@/types/machining.ts';
 import { RenderedTask, Task, TaskType, Units } from '@/types/tasks.ts';
 import { defaultBounds } from '@/workers/transformWorker/functions/defaultBounds.ts';
 
+export type UpdateTaskFunction = (fileName: string, updatedTask: Partial<Task>) => void;
+
 interface MainContextValue {
   tasks: Task[];
-  updateTask: (fileName: string, updatedTask: Partial<Task>) => void;
-  updateMachiningOperationParam: (taskType: TaskType, param: keyof MachiningParams, value: string) => void;
+  updateTask: UpdateTaskFunction;
+  updateMachiningOperationParams: (taskType: TaskType, update: Partial<MachiningParams>) => void;
   setTasks: (tasks: Task[]) => void;
   busy: boolean,
   progress: number,
@@ -24,8 +27,10 @@ interface MainContextValue {
   globalBounds: IntRect;
   globalUnits: Units;
   machiningOperations: MachiningOperations;
+  setOperationForm: (operationForm: TaskType | null) => void;
   operationForm: TaskType | null;
-  setOprtationForm: (operationForm: TaskType | null) => void;
+  setTaskForm: (fileName: string) => void;
+  taskForm: string;
 }
 
 const MACHINING_PARAMS_STORAGE_KEY = 'machiningParams';
@@ -33,7 +38,7 @@ const MACHINING_PARAMS_STORAGE_KEY = 'machiningParams';
 const mainContext = createContext<MainContextValue | null>(null);
 
 export function MainProvider({ children }: PropsWithChildren) {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasksRaw] = useState<Task[]>([]);
   const [busy, setBusy] = useState<boolean>(false);
   const [activeHandles, setActiveHandles] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
@@ -42,28 +47,35 @@ export function MainProvider({ children }: PropsWithChildren) {
   const [globalUnits, setGlobalUnits] = useState<Units>(Units.MILLIMETERS);
   const [globalErrors, setGlobalErrors] = useState<string[]>([]);
   const [machiningOperations, setMachiningOperations] = useLocalStorage<MachiningOperations>(MACHINING_PARAMS_STORAGE_KEY, machiningDefaultOperations());
-  const [operationForm, setOprtationForm] = useState<TaskType | null>(null);
+  const [operationForm, setOperationForm] = useState<TaskType | null>(null);
+  const [taskForm, setTaskForm] = useState<string>('');
 
   const updateTask = useCallback((fileName: string, updatedTask: Partial<Task>) => {
-    setTasks((currentTasks) => (
-      currentTasks.map((currentTask: Task) => {
-        if (currentTask.fileName !== fileName) {
-          return currentTask;
-        }
+    setTasksRaw((currentTasks) => (
+      currentTasks
+        .map((currentTask: Task) => {
+          if (currentTask.fileName !== fileName) {
+            return currentTask;
+          }
 
-        return {
-          ...currentTask,
-          ...updatedTask,
-        };
-      })
+          return {
+            ...currentTask,
+            ...updatedTask,
+          };
+        })
+        .sort(sortTasks)
     ));
   }, []);
 
-  const updateMachiningOperationParam = useCallback((taskType: TaskType, param: keyof MachiningParams, value: string) => {
+  const setTasks = useCallback((newTasks: Task[]) => {
+    setTasksRaw([...newTasks].sort(sortTasks));
+  }, []);
+
+  const updateMachiningOperationParams = useCallback((taskType: TaskType, update: Partial<MachiningParams>) => {
     const currentOperations = machiningOperations || machiningDefaultOperations();
     const updatedParams: MachiningParams = {
       ...currentOperations[taskType],
-      [param]: value,
+      ...update,
     };
 
     setMachiningOperations({
@@ -98,20 +110,22 @@ export function MainProvider({ children }: PropsWithChildren) {
     setTasks,
     setBusy,
     setActiveHandles,
-    setOprtationForm,
+    setOperationForm,
+    setTaskForm,
     tasks,
     busy,
     progress,
     activeHandles,
     globalErrors,
     updateTask,
-    updateMachiningOperationParam,
+    updateMachiningOperationParams,
     renderedTasks,
     globalBounds,
     globalUnits,
     operationForm,
+    taskForm,
     machiningOperations: machiningOperations as MachiningOperations,
-  }), [tasks, busy, progress, activeHandles, globalErrors, updateTask, updateMachiningOperationParam, renderedTasks, globalBounds, globalUnits, operationForm, machiningOperations]);
+  }), [setTasks, tasks, busy, progress, activeHandles, globalErrors, updateTask, updateMachiningOperationParams, renderedTasks, globalBounds, globalUnits, operationForm, taskForm, machiningOperations]);
 
   return (
     <mainContext.Provider value={contextValue}>
