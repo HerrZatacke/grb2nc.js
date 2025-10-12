@@ -29,6 +29,7 @@ jobs:
       - name: Build for pages 📖
         env:
           NEXT_PUBLIC_BASE_PATH: /grb2nc.js
+          NEXT_PUBLIC_SVG_SCALE: 1000
         run: |
           npm run build
           touch out/.nojekyll
