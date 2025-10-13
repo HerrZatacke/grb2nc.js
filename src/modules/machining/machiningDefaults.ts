@@ -58,5 +58,6 @@ export const machiningDefaultOperations = (): MachiningOperations => {
     [TaskType.DRILL]: machiningDefaultParams(TaskType.DRILL),
     [TaskType.ISOLATION]: machiningDefaultParams(TaskType.ISOLATION),
     [TaskType.EDGE_CUT]: machiningDefaultParams(TaskType.EDGE_CUT),
+    [TaskType.DRAWING]: machiningDefaultParams(TaskType.ISOLATION),
   };
 };

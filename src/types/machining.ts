@@ -18,4 +18,5 @@ export interface MachiningOperations {
   [TaskType.DRILL]: MachiningParams;
   [TaskType.ISOLATION]: MachiningParams;
   [TaskType.EDGE_CUT]: MachiningParams;
+  [TaskType.DRAWING]: MachiningParams;
 }
