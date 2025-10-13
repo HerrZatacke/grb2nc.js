@@ -2,7 +2,7 @@ import type { CircleShape } from '@hpcreery/tracespace-plotter';
 import type { IntRect } from 'clipper-lib';
 import { transformer } from '@/modules/transformer';
 import type { Point, Polygon } from '@/types/geo';
-import { TaskType } from '@/types/tasks.ts';
+import { Layer, TaskType } from '@/types/tasks.ts';
 
 interface StrokeProps {
   stroke: string;
@@ -47,7 +47,7 @@ export const circleShapeToSVGPath = (circleShape: CircleShape): string => {
   ].join(' ');
 };
 
-export const getColor = (taskType: TaskType, flip: boolean): string => {
+export const getColor = (taskType: TaskType, layer: Layer): string => {
   if (taskType === TaskType.EDGE_CUT) {
     return 'edgecut';
   }
@@ -56,7 +56,18 @@ export const getColor = (taskType: TaskType, flip: boolean): string => {
     return 'drill';
   }
 
-  return flip ? 'bottom' : 'top';
+  if (taskType === TaskType.DRAWING) {
+    return 'drawing';
+  }
+
+  switch (layer) {
+    case Layer.BOTTOM:
+      return 'bottom';
+    case Layer.TOP:
+      return 'top';
+  }
+
+  return 'drawing';
 };
 
 export const getGridStrokeProps = (index?: number): StrokeProps => {

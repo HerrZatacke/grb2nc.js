@@ -18,14 +18,14 @@ export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWit
     polygons,
     drills,
     type,
-    flip,
+    layer,
     steps,
     offset,
     hidePaths,
     hideAreas,
   } = taskWithPolygons;
 
-  const color = getColor(type, flip);
+  const color = getColor(type, layer);
 
   const polygonsToSVGPathsStart = performance.now();
 

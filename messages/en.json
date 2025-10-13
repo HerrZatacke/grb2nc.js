@@ -1,4 +1,12 @@
 {
+  "TaskListEntry": {
+    "typeIconLabel": {
+      "isolation": "Isolation",
+      "drill": "Drill",
+      "edgecut": "Edgecut",
+      "drawing": "Drawing/other"
+    }
+  },
   "FileInput": {
     "openFiles": "Open File(s)",
     "watchFiles": "{activeHandles, plural, =0 {Watch file(s)} =1 {Watching 1 file} other {Watching # files}} "

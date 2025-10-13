@@ -19,6 +19,10 @@
   --color-stroke-bottom: rgba(0, 64, 255, var(--fill-outline-opacity));
   --color-path-bottom: rgba(0, 64, 255, var(--path-opacity));
 
+  --color-fill-drawing: rgba(192, 192, 192, var(--fill-opacity));
+  --color-stroke-drawing: rgba(192, 192, 192, var(--fill-outline-opacity));
+  --color-path-drawing: rgba(192, 192, 192, var(--path-opacity));
+
   --color-grid-origin: rgba(127, 127, 127, 0.6);
   --color-grid-strong: rgba(127, 127, 127, 0.5);
   --color-grid-regular: rgba(127, 127, 127, 0.4);

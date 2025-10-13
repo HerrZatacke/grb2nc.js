@@ -1,6 +1,7 @@
-import { useCallback, type ChangeEvent, useState, useEffect } from 'react';
+import { identifyLayers, type LayerIdentity } from '@tracespace/identify-layers';
+import { type ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useMainContext } from '@/components/MainContext';
-import { Task, TaskType } from '@/types/tasks.ts';
+import { Layer, Task, TaskType } from '@/types/tasks.ts';
 
 export interface UseFileReader {
   canUseFilePicker: boolean;
@@ -15,6 +16,8 @@ export const getSteps = (type: TaskType): number => {
     case TaskType.ISOLATION:
       return 1;
     case TaskType.DRILL:
+      return 0;
+    default:
       return 0;
   }
 };
@@ -80,40 +83,70 @@ export const useFileReader = (): UseFileReader => {
     }
   }, [setActiveHandles]);
 
-  const createTaskFromFile = useCallback(async (taskFile: File): Promise<Task | null> => {
+  const createTaskFromFile = useCallback(async (taskFile: File, identity: LayerIdentity): Promise<Task | null> => {
     const name = (taskFile.name as string).toLowerCase();
     const ext = name.split('.').pop() || '';
-    if (!extensions.includes(`.${ext}`)) return null;
+    if (!extensions.includes(`.${ext}`)) {
+      return null;
+    }
+
+    let hideAreas = true;
+
+    let layer: Layer;
+    switch (identity.side) {
+      case 'top':
+        layer = Layer.TOP;
+        break;
+      case 'all': // drill and edgecuts
+      case 'bottom':
+        layer = Layer.BOTTOM;
+        break;
+      default:
+        layer = Layer.OTHER;
+        break;
+    }
 
     let type: TaskType;
-    let flip: boolean;
+    switch (identity.type) {
+      case 'copper':
+        type = TaskType.ISOLATION;
+        hideAreas = false;
+        break;
+      case 'drill':
+        type = TaskType.DRILL;
+        hideAreas = false;
+        break;
+      case 'outline':
+        type = TaskType.EDGE_CUT;
+        hideAreas = false;
+        break;
 
-    // for now, let's flip everything but the top layer, because they can be milled at the same time as the bottom copper
-    if (ext === 'drl') {
-      type = TaskType.DRILL;
-      flip = true;
-    } else if (name.includes('edge')) {
-      type = TaskType.EDGE_CUT;
-      flip = true;
-    } else if (name.includes('b_cu') || name.includes('bottom')) {
-      type = TaskType.ISOLATION;
-      flip = true;
-    } else {
-      // only the top layer does not get flipped
-      type = TaskType.ISOLATION;
-      flip = false;
+      case 'silkscreen':
+      case 'soldermask':
+      case 'solderpaste':
+        hideAreas = false;
+        type = TaskType.DRAWING;
+        layer = Layer.OTHER;
+        break;
+
+      default:
+        type = TaskType.DRAWING;
+        layer = Layer.OTHER;
+        break;
     }
+
+
 
     return {
       fileName: taskFile.name,
       fileTime: taskFile.lastModified,
       fileContent: await taskFile.text(),
-      hidePaths: false,
-      hideAreas: false,
+      hidePaths: layer === Layer.OTHER,
+      hideAreas,
       steps: getSteps(type),
       offset: getOffset(type),
       type,
-      flip,
+      layer,
     };
   }, []);
 
@@ -121,11 +154,14 @@ export const useFileReader = (): UseFileReader => {
     if (!fileHandles?.length) { return; }
 
     const updateHandles = async () => {
+      const layerMapping = identifyLayers(fileHandles.map((handle) => (handle.name)));
+
       const newTasks: Task[] = (await Promise.all(
         fileHandles.map(async (handle): Promise<Task | null> => {
+          const identity = layerMapping[handle.name];
           try {
             const file = await handle.getFile();
-            return createTaskFromFile(file);
+            return createTaskFromFile(file, identity);
           } catch {
             return null;
           }
@@ -147,7 +183,14 @@ export const useFileReader = (): UseFileReader => {
   const onFileInputChange = useCallback(async (ev: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const input = ev.currentTarget;
     if (!input.files?.length) { throw new Error('can not read files'); }
-    const newTasks: (Task | null)[] = await Promise.all([...input.files].map(createTaskFromFile));
+
+    const layerMapping = identifyLayers([...input.files].map((handle) => (handle.name)));
+
+    const newTasks: (Task | null)[] = await Promise.all([...input.files].map((file) => {
+      const identity = layerMapping[file.name];
+      return createTaskFromFile(file, identity);
+    }));
+
     input.value = '';
     setTasks(newTasks.filter(Boolean) as Task[]);
   }, [createTaskFromFile, setTasks]);

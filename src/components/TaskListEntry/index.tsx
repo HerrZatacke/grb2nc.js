@@ -6,6 +6,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 import HideImageIcon from '@mui/icons-material/HideImage';
 import ImageIcon from '@mui/icons-material/Image';
+import PaletteIcon from '@mui/icons-material/Palette';
 import RouteIcon from '@mui/icons-material/Route';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -14,6 +15,7 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import { useTranslations } from 'next-intl';
 import { type ComponentType, useMemo } from 'react';
 import { UpdateTaskFunction, useMainContext } from '@/components/MainContext';
 import { useDownloadNC } from '@/hooks/useDownloadNC.ts';
@@ -27,6 +29,8 @@ const typeIcon = (type: TaskType): ComponentType => {
       return CarpenterIcon;
     case TaskType.ISOLATION:
       return RouteIcon;
+    case TaskType.DRAWING:
+      return PaletteIcon;
     default:
       return () => null;
   }
@@ -38,6 +42,7 @@ interface Props {
 }
 
 export default function TaskListEntry({ task, updateTask }: Props) {
+  const t= useTranslations('TaskListEntry');
   const { busy, setTaskForm } = useMainContext();
   const { downloadNCCode } = useDownloadNC();
 
@@ -46,7 +51,9 @@ export default function TaskListEntry({ task, updateTask }: Props) {
 
   return (
     <ListItem>
-      <ListItemIcon>
+      <ListItemIcon
+        title={t(`typeIconLabel.${type}`)}
+      >
         <IconComponent />
       </ListItemIcon>
       <ListItemText primary={fileName} />
@@ -57,12 +64,14 @@ export default function TaskListEntry({ task, updateTask }: Props) {
         sx={{ marginLeft: 4 }}
       >
         <Button
+          disabled={type === TaskType.DRAWING}
           onClick={() => {
             updateTask(
               task.fileName,
               { hidePaths: !task.hidePaths },
             );
           }}
+          color={task.hidePaths ? 'error' : 'primary'}
         >
           {task.hidePaths ? <VisibilityOffIcon /> : <VisibilityIcon />}
         </Button>
@@ -73,11 +82,12 @@ export default function TaskListEntry({ task, updateTask }: Props) {
               { hideAreas: !task.hideAreas },
             );
           }}
+          color={task.hideAreas ? 'error' : 'primary'}
         >
           {task.hideAreas ? <HideImageIcon /> : <ImageIcon />}
         </Button>
         <Button
-          disabled={type === TaskType.DRILL}
+          disabled={type === TaskType.DRILL || type === TaskType.DRAWING}
           onClick={() => {
             setTaskForm(task.fileName);
           }}
@@ -85,6 +95,7 @@ export default function TaskListEntry({ task, updateTask }: Props) {
           <EditIcon />
         </Button>
         <Button
+          disabled={type === TaskType.DRAWING}
           onClick={() => {
             downloadNCCode(task.fileName);
           }}

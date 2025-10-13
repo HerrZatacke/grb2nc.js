@@ -5,11 +5,18 @@ export enum TaskType {
   ISOLATION = 'isolation',
   EDGE_CUT = 'edgecut',
   DRILL = 'drill',
+  DRAWING = 'drawing',
 }
 
 export enum Units {
   MILLIMETERS = 'mm',
   INCHES = 'in',
+}
+
+export enum Layer {
+  TOP = 'top',
+  BOTTOM = 'bottom',
+  OTHER = 'other',
 }
 
 export interface EditableTask {
@@ -22,7 +29,7 @@ export interface Task extends EditableTask {
   fileTime: number;
   fileContent: string;
   type: TaskType;
-  flip: boolean;
+  layer: Layer;
   hidePaths: boolean;
   hideAreas: boolean;
 }

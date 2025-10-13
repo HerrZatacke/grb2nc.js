@@ -1,8 +1,9 @@
-import { saveAs } from 'file-saver';
-import { useCallback } from 'react';
-import { useMainContext } from '@/components/MainContext';
-import { Flip, generateGCode } from '@/modules/machining/generateGCode.ts';
-import { transformer } from '@/modules/transformer';
+import {saveAs} from 'file-saver';
+import {useCallback} from 'react';
+import {useMainContext} from '@/components/MainContext';
+import {Flip, generateGCode} from '@/modules/machining/generateGCode.ts';
+import {transformer} from '@/modules/transformer';
+import {Layer} from "@/types/tasks.ts";
 
 interface UseDownloadNC {
   downloadNCCode: (fileName: string) => void;
@@ -18,7 +19,7 @@ export const useDownloadNC = (): UseDownloadNC => {
     const gCode = generateGCode({
       contours: renderedTask.offsetPaths.flat(1),
       drills: renderedTask.drills,
-      flip: renderedTask.flip ? Flip.Y : Flip.BOTH,
+      flip: renderedTask.layer === Layer.TOP ? Flip.Y : Flip.BOTH,
       params: machiningOperations[renderedTask.type],
       scale: transformer.getScale(),
       description: `${renderedTask.type} - "${renderedTask.fileName}"`,
