@@ -1,12 +1,17 @@
 import { identifyLayers, type LayerIdentity } from '@tracespace/identify-layers';
 import { type ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useMainContext } from '@/components/MainContext';
-import { Layer, Task, TaskType } from '@/types/tasks.ts';
+import { Layer, Task, TaskType, TaskVisibility } from '@/types/tasks.ts';
 
 export interface UseFileReader {
   canUseFilePicker: boolean;
   onFileInputChange: (ev: ChangeEvent<HTMLInputElement>) => Promise<void>;
   requestInputHandle: () => void;
+}
+
+export interface CreateTasksResult {
+  task: Task | null;
+  taskVisibility: TaskVisibility | null;
 }
 
 export const getSteps = (type: TaskType): number => {
@@ -55,7 +60,7 @@ const tasksAreEqual = (arr1: Task[], arr2: Task[]): boolean => {
 };
 
 export const useFileReader = (): UseFileReader => {
-  const { tasks, setTasks, setActiveHandles } = useMainContext();
+  const { tasks, setTasks, setActiveHandles, setVisibilities } = useMainContext();
   const [fileHandles, setFileHandles] = useState<FileSystemFileHandle[]>();
   const [canUseFilePicker, setCanUseFilePicker] = useState(false);
 
@@ -83,11 +88,14 @@ export const useFileReader = (): UseFileReader => {
     }
   }, [setActiveHandles]);
 
-  const createTaskFromFile = useCallback(async (taskFile: File, identity: LayerIdentity): Promise<Task | null> => {
+  const createTaskFromFile = useCallback(async (taskFile: File, identity: LayerIdentity): Promise<CreateTasksResult> => {
     const name = (taskFile.name as string).toLowerCase();
     const ext = name.split('.').pop() || '';
     if (!extensions.includes(`.${ext}`)) {
-      return null;
+      return {
+        task: null,
+        taskVisibility: null,
+      };
     }
 
     let hideAreas = true;
@@ -135,20 +143,39 @@ export const useFileReader = (): UseFileReader => {
         break;
     }
 
-
-
-    return {
+    const task: Task = {
       fileName: taskFile.name,
       fileTime: taskFile.lastModified,
       fileContent: await taskFile.text(),
-      hidePaths: layer === Layer.OTHER,
-      hideAreas,
       steps: getSteps(type),
       offset: getOffset(type),
       type,
       layer,
     };
+
+    const taskVisibility: TaskVisibility = {
+      fileName: taskFile.name,
+      hidePaths: layer === Layer.OTHER,
+      hideAreas,
+    };
+
+    return { task, taskVisibility };
   }, []);
+
+  const setUpdatedResults = useCallback((createTaskResults: CreateTasksResult[]) => {
+    const newTasks = createTaskResults.reduce((acc: Task[], { task }): Task[] => (
+      task ? [...acc, task] : acc
+    ), []);
+
+    const newTaskVisibilitiess = createTaskResults.reduce((acc: TaskVisibility[], { taskVisibility }): TaskVisibility[] => (
+      taskVisibility ? [...acc, taskVisibility] : acc
+    ), []);
+
+    if (!tasksAreEqual(tasks, newTasks)) {
+      setTasks(newTasks);
+      setVisibilities(newTaskVisibilitiess);
+    }
+  }, [setVisibilities, setTasks, tasks]);
 
   useEffect(() => {
     if (!fileHandles?.length) { return; }
@@ -156,29 +183,26 @@ export const useFileReader = (): UseFileReader => {
     const updateHandles = async () => {
       const layerMapping = identifyLayers(fileHandles.map((handle) => (handle.name)));
 
-      const newTasks: Task[] = (await Promise.all(
-        fileHandles.map(async (handle): Promise<Task | null> => {
+      const createTaskResults: CreateTasksResult[] = (await Promise.all(
+        fileHandles.map(async (handle): Promise<CreateTasksResult> => {
           const identity = layerMapping[handle.name];
           try {
             const file = await handle.getFile();
             return createTaskFromFile(file, identity);
           } catch {
-            return null;
+            return { taskVisibility: null, task: null };
           }
         }),
-      ))
-        .filter(Boolean) as Task[];
+      ));
 
-      if (!tasksAreEqual(tasks, newTasks)) {
-        setTasks(newTasks);
-      }
+      setUpdatedResults(createTaskResults);
     };
 
     const intervalHandle = window.setInterval(updateHandles, 2000);
     updateHandles();
 
     return () => window.clearInterval(intervalHandle);
-  }, [createTaskFromFile, fileHandles, setTasks, tasks]);
+  }, [createTaskFromFile, fileHandles, setUpdatedResults]);
 
   const onFileInputChange = useCallback(async (ev: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const input = ev.currentTarget;
@@ -186,14 +210,14 @@ export const useFileReader = (): UseFileReader => {
 
     const layerMapping = identifyLayers([...input.files].map((handle) => (handle.name)));
 
-    const newTasks: (Task | null)[] = await Promise.all([...input.files].map((file) => {
+    const newTasks: (CreateTasksResult)[] = await Promise.all([...input.files].map((file): Promise<CreateTasksResult> => {
       const identity = layerMapping[file.name];
       return createTaskFromFile(file, identity);
     }));
 
     input.value = '';
-    setTasks(newTasks.filter(Boolean) as Task[]);
-  }, [createTaskFromFile, setTasks]);
+    setUpdatedResults(newTasks);
+  }, [createTaskFromFile, setUpdatedResults]);
 
   return {
     canUseFilePicker,

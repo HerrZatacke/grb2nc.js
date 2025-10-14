@@ -20,18 +20,19 @@ export enum Layer {
 }
 
 export interface TaskVisibility {
+  fileName: string;
   hidePaths: boolean;
   hideAreas: boolean;
 }
 
 export interface EditableTask {
+  fileName: string;
+  fileTime: number;
   steps: number;
   offset: number;
 }
 
-export interface Task extends EditableTask, TaskVisibility{
-  fileName: string;
-  fileTime: number;
+export interface Task extends EditableTask {
   fileContent: string;
   type: TaskType;
   layer: Layer;

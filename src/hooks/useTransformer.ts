@@ -2,7 +2,7 @@ import { IntRect } from 'clipper-lib';
 import { Remote, wrap, proxy } from 'comlink';
 import { useEffect, useRef } from 'react';
 import { transformer } from '@/modules/transformer';
-import { Task, RenderedTask, Units } from '@/types/tasks.ts';
+import type { Task, RenderedTask, Units, TaskVisibility } from '@/types/tasks.ts';
 import {
   ITansformWorkerApi,
   TransformWorkerParams,
@@ -11,6 +11,7 @@ import {
 
 interface UseTransformerParams {
   tasks: Task[];
+  visibilities: TaskVisibility[];
   setBusy: (busy: boolean) => void;
   setProgress: (progress: number) => void;
   setRenderedTasks: (renderedTasks: RenderedTask[]) => void;
@@ -21,7 +22,7 @@ interface UseTransformerParams {
 }
 
 export const useTransformer = (useTransformerParams: UseTransformerParams) => {
-  const { tasks, setBusy, setRenderedTasks, setGlobalBounds, setProgress, setGlobalError, resetGlobalError, setGlobalUnits } = useTransformerParams;
+  const { tasks, visibilities, setBusy, setRenderedTasks, setGlobalBounds, setProgress, setGlobalError, resetGlobalError, setGlobalUnits } = useTransformerParams;
   const workerApi = useRef<Remote<ITansformWorkerApi> | null>(null);
 
   const scale = transformer.getScale();
@@ -64,6 +65,7 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
 
     const params: TransformWorkerParams = {
       tasks,
+      visibilities,
       scale,
     };
 
@@ -72,5 +74,5 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
       .catch((error) => {
         setGlobalError((error as Error).message);
       });
-  }, [tasks, setBusy, scale, setGlobalBounds, setRenderedTasks, setProgress, setGlobalUnits, setGlobalError, resetGlobalError]);
+  }, [resetGlobalError, scale, setBusy, setGlobalBounds, setGlobalError, setGlobalUnits, setProgress, setRenderedTasks, tasks, visibilities]);
 };

@@ -42,11 +42,17 @@ interface Props {
 
 export default function TaskListEntry({ task }: Props) {
   const t= useTranslations('TaskListEntry');
-  const { busy, setTaskForm, updateTaskVisibility } = useMainContext();
+  const { busy, setTaskForm, updateVisibility, visibilities } = useMainContext();
   const { downloadNCCode } = useDownloadNC();
+
+  const taskVisibility = useMemo(() => (
+    visibilities.find(({ fileName }) => fileName === task.fileName) || null
+  ), [task.fileName, visibilities]);
 
   const { fileName, type } = task;
   const IconComponent = useMemo(() => typeIcon(type), [type]);
+
+  if (!taskVisibility) { return null; }
 
   return (
     <ListItem>
@@ -65,25 +71,25 @@ export default function TaskListEntry({ task }: Props) {
         <Button
           disabled={type === TaskType.DRAWING}
           onClick={() => {
-            updateTaskVisibility(
+            updateVisibility(
               task.fileName,
-              { hidePaths: !task.hidePaths },
+              { hidePaths: !taskVisibility.hidePaths },
             );
           }}
-          color={task.hidePaths ? 'error' : 'primary'}
+          color={taskVisibility.hidePaths ? 'error' : 'primary'}
         >
-          {task.hidePaths ? <VisibilityOffIcon /> : <VisibilityIcon />}
+          {taskVisibility.hidePaths ? <VisibilityOffIcon /> : <VisibilityIcon />}
         </Button>
         <Button
           onClick={() => {
-            updateTaskVisibility(
+            updateVisibility(
               task.fileName,
-              { hideAreas: !task.hideAreas },
+              { hideAreas: !taskVisibility.hideAreas },
             );
           }}
-          color={task.hideAreas ? 'error' : 'primary'}
+          color={taskVisibility.hideAreas ? 'error' : 'primary'}
         >
-          {task.hideAreas ? <HideImageIcon /> : <ImageIcon />}
+          {taskVisibility.hideAreas ? <HideImageIcon /> : <ImageIcon />}
         </Button>
         <Button
           disabled={type === TaskType.DRILL || type === TaskType.DRAWING}

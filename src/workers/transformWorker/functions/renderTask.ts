@@ -1,11 +1,11 @@
 import type { CircleShape } from '@hpcreery/tracespace-plotter';
 import { circleShapeToSVGPath, getAreaStroke, getColor, getOffsetStroke, polygonsToSVGPaths } from '@/modules/renderSVG';
 import { Polygon } from '@/types/geo';
-import { type RenderedTask, type SVGPathProps, TaskType, type TaskWithPolygons } from '@/types/tasks.ts';
+import { type RenderedTask, type SVGPathProps, TaskType, TaskVisibility, type TaskWithPolygons } from '@/types/tasks.ts';
 import { createOffsetPaths } from '@/workers/transformWorker/functions/createOffsetPaths.ts';
 import { RenderTaskParams } from '@/workers/transformWorker/functions/types.ts';
 
-export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWithPolygons: TaskWithPolygons): Promise<RenderedTask> => {
+export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWithPolygons: TaskWithPolygons, visibilty: TaskVisibility): Promise<RenderedTask> => {
   const {
     scale,
     timings,
@@ -21,17 +21,18 @@ export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWit
     layer,
     steps,
     offset,
-    hidePaths,
-    hideAreas,
   } = taskWithPolygons;
+
+  const {
+    hideAreas,
+    hidePaths,
+  } = visibilty;
 
   const color = getColor(type, layer);
 
   const polygonsToSVGPathsStart = performance.now();
 
   const svgPaths = polygonsToSVGPaths(polygons, scale);
-
-  // progressAddEstimate(3);
 
   const svgPathProps: SVGPathProps[] = [{
     path: svgPaths.join('\n'),

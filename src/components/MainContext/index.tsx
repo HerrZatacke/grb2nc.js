@@ -15,25 +15,27 @@ export type UpdateTaskVisibilityFunction = (fileName: string, updatedTask: Parti
 export type UpdateMachiningOperationParamsFunction = (taskType: TaskType, update: Partial<MachiningParams>) => void
 
 interface MainContextValue {
-  tasks: Task[];
-  updateTaskParams: UpdateTaskParamsFunction;
-  updateTaskVisibility: UpdateTaskVisibilityFunction;
-  updateMachiningOperationParams: UpdateMachiningOperationParamsFunction;
-  setTasks: (tasks: Task[]) => void;
-  busy: boolean,
-  progress: number,
   activeHandles: number,
-  globalErrors: string[],
-  setBusy: (busy: boolean) => void;
-  setActiveHandles: (count: number) => void;
-  renderedTasks: RenderedTask[];
+  busy: boolean,
   globalBounds: IntRect;
+  globalErrors: string[],
   globalUnits: Units;
   machiningOperations: MachiningOperations;
-  setOperationForm: (operationForm: TaskType | null) => void;
   operationForm: TaskType | null;
+  progress: number,
+  renderedTasks: RenderedTask[];
+  setActiveHandles: (count: number) => void;
+  setBusy: (busy: boolean) => void;
+  setOperationForm: (operationForm: TaskType | null) => void;
   setTaskForm: (fileName: string) => void;
+  setTasks: (tasks: Task[]) => void;
+  setVisibilities: (vilibilities: TaskVisibility[]) => void;
   taskForm: string;
+  tasks: Task[];
+  updateMachiningOperationParams: UpdateMachiningOperationParamsFunction;
+  updateTaskParams: UpdateTaskParamsFunction;
+  updateVisibility: UpdateTaskVisibilityFunction;
+  visibilities: TaskVisibility[];
 }
 
 const MACHINING_PARAMS_STORAGE_KEY = 'machiningParams';
@@ -42,6 +44,7 @@ const mainContext = createContext<MainContextValue | null>(null);
 
 export function MainProvider({ children }: PropsWithChildren) {
   const [tasks, setTasksRaw] = useState<Task[]>([]);
+  const [visibilities, setVisibilities] = useState<TaskVisibility[]>([]);
   const [busy, setBusy] = useState<boolean>(false);
   const [activeHandles, setActiveHandles] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
@@ -70,10 +73,10 @@ export function MainProvider({ children }: PropsWithChildren) {
     ));
   }, []);
 
-  const updateTaskVisibility = useCallback((fileName: string, updatedTask: Partial<TaskVisibility>) => {
-    setTasksRaw((currentTasks) => (
+  const updateVisibility = useCallback((fileName: string, updatedTask: Partial<TaskVisibility>) => {
+    setVisibilities((currentTasks) => (
       currentTasks
-        .map((currentTask: Task) => {
+        .map((currentTask: TaskVisibility) => {
           if (currentTask.fileName !== fileName) {
             return currentTask;
           }
@@ -83,7 +86,6 @@ export function MainProvider({ children }: PropsWithChildren) {
             ...updatedTask,
           };
         })
-        .sort(sortTasks)
     ));
   }, []);
 
@@ -117,6 +119,7 @@ export function MainProvider({ children }: PropsWithChildren) {
 
   useTransformer({
     tasks,
+    visibilities,
     setBusy,
     setRenderedTasks,
     setGlobalBounds,
@@ -127,26 +130,30 @@ export function MainProvider({ children }: PropsWithChildren) {
   });
 
   const contextValue: MainContextValue = useMemo(() => ({
-    setTasks,
-    setBusy,
+    activeHandles,
+    busy,
+    globalBounds,
+    globalErrors,
+    globalUnits,
+    machiningOperations: machiningOperations as MachiningOperations,
+    operationForm,
+    progress,
+    renderedTasks,
     setActiveHandles,
+    setBusy,
     setOperationForm,
     setTaskForm,
-    tasks,
-    busy,
-    progress,
-    activeHandles,
-    globalErrors,
-    updateTaskParams,
-    updateTaskVisibility,
-    updateMachiningOperationParams,
-    renderedTasks,
-    globalBounds,
-    globalUnits,
-    operationForm,
+    setTasks,
+    setVisibilities,
     taskForm,
-    machiningOperations: machiningOperations as MachiningOperations,
-  }), [setTasks, tasks, busy, progress, activeHandles, globalErrors, updateTaskParams, updateTaskVisibility, updateMachiningOperationParams, renderedTasks, globalBounds, globalUnits, operationForm, taskForm, machiningOperations]);
+    tasks,
+    updateMachiningOperationParams,
+    updateTaskParams,
+    updateVisibility,
+    visibilities,
+  }), [activeHandles, busy, globalBounds, globalErrors, globalUnits, machiningOperations, operationForm, progress, renderedTasks, setTasks, taskForm, tasks, updateMachiningOperationParams, updateTaskParams, updateVisibility, visibilities]);
+
+  console.log({ tasks, visibilities });
 
   return (
     <mainContext.Provider value={contextValue}>
