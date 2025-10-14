@@ -19,19 +19,22 @@ export enum Layer {
   OTHER = 'other',
 }
 
+export interface TaskVisibility {
+  hidePaths: boolean;
+  hideAreas: boolean;
+}
+
 export interface EditableTask {
   steps: number;
   offset: number;
 }
 
-export interface Task extends EditableTask {
+export interface Task extends EditableTask, TaskVisibility{
   fileName: string;
   fileTime: number;
   fileContent: string;
   type: TaskType;
   layer: Layer;
-  hidePaths: boolean;
-  hideAreas: boolean;
 }
 
 export interface TaskWithPolygons extends Task {

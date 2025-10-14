@@ -16,7 +16,7 @@ export default function TaskParamsForm() {
   const {
     taskForm,
     tasks,
-    updateTask,
+    updateTaskParams,
     setTaskForm,
   } = useMainContext();
   const t = useTranslations('TaskParamsForm');
@@ -51,9 +51,9 @@ export default function TaskParamsForm() {
   const save = useCallback(() => {
     if (!taskForm) { return; }
     setTaskForm('');
-    updateTask(taskForm, editedValues);
+    updateTaskParams(taskForm, editedValues);
     setEditedValues({});
-  }, [editedValues, setTaskForm, taskForm, updateTask]);
+  }, [editedValues, setTaskForm, taskForm, updateTaskParams]);
 
   if (!task || !editValues) {
     return null;

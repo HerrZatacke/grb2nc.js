@@ -17,7 +17,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { useTranslations } from 'next-intl';
 import { type ComponentType, useMemo } from 'react';
-import { UpdateTaskFunction, useMainContext } from '@/components/MainContext';
+import { useMainContext } from '@/components/MainContext';
 import { useDownloadNC } from '@/hooks/useDownloadNC.ts';
 import { Task, TaskType } from '@/types/tasks.ts';
 
@@ -38,12 +38,11 @@ const typeIcon = (type: TaskType): ComponentType => {
 
 interface Props {
   task: Task;
-  updateTask: UpdateTaskFunction;
 }
 
-export default function TaskListEntry({ task, updateTask }: Props) {
+export default function TaskListEntry({ task }: Props) {
   const t= useTranslations('TaskListEntry');
-  const { busy, setTaskForm } = useMainContext();
+  const { busy, setTaskForm, updateTaskVisibility } = useMainContext();
   const { downloadNCCode } = useDownloadNC();
 
   const { fileName, type } = task;
@@ -66,7 +65,7 @@ export default function TaskListEntry({ task, updateTask }: Props) {
         <Button
           disabled={type === TaskType.DRAWING}
           onClick={() => {
-            updateTask(
+            updateTaskVisibility(
               task.fileName,
               { hidePaths: !task.hidePaths },
             );
@@ -77,7 +76,7 @@ export default function TaskListEntry({ task, updateTask }: Props) {
         </Button>
         <Button
           onClick={() => {
-            updateTask(
+            updateTaskVisibility(
               task.fileName,
               { hideAreas: !task.hideAreas },
             );

@@ -6,7 +6,7 @@ import { useMainContext } from '@/components/MainContext';
 import TaskListEntry from '@/components/TaskListEntry';
 
 export default function TaskList() {
-  const { tasks, updateTask  } = useMainContext();
+  const { tasks  } = useMainContext();
   if (!tasks.length) { return null; }
 
   return (
@@ -17,7 +17,6 @@ export default function TaskList() {
             <TaskListEntry
               key={task.fileName}
               task={task}
-              updateTask={updateTask}
             />
           );
         })}

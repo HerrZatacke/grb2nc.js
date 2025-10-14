@@ -7,15 +7,18 @@ import { useTransformer } from '@/hooks/useTransformer.ts';
 import { machiningDefaultOperations } from '@/modules/machining/machiningDefaults.ts';
 import { sortTasks } from '@/modules/sortTasks';
 import { MachiningOperations, MachiningParams } from '@/types/machining.ts';
-import { RenderedTask, Task, TaskType, Units } from '@/types/tasks.ts';
+import { EditableTask, RenderedTask, Task, TaskType, TaskVisibility, Units } from '@/types/tasks.ts';
 import { defaultBounds } from '@/workers/transformWorker/functions/defaultBounds.ts';
 
-export type UpdateTaskFunction = (fileName: string, updatedTask: Partial<Task>) => void;
+export type UpdateTaskParamsFunction = (fileName: string, updatedTask: Partial<EditableTask>) => void;
+export type UpdateTaskVisibilityFunction = (fileName: string, updatedTask: Partial<TaskVisibility>) => void;
+export type UpdateMachiningOperationParamsFunction = (taskType: TaskType, update: Partial<MachiningParams>) => void
 
 interface MainContextValue {
   tasks: Task[];
-  updateTask: UpdateTaskFunction;
-  updateMachiningOperationParams: (taskType: TaskType, update: Partial<MachiningParams>) => void;
+  updateTaskParams: UpdateTaskParamsFunction;
+  updateTaskVisibility: UpdateTaskVisibilityFunction;
+  updateMachiningOperationParams: UpdateMachiningOperationParamsFunction;
   setTasks: (tasks: Task[]) => void;
   busy: boolean,
   progress: number,
@@ -50,7 +53,24 @@ export function MainProvider({ children }: PropsWithChildren) {
   const [operationForm, setOperationForm] = useState<TaskType | null>(null);
   const [taskForm, setTaskForm] = useState<string>('');
 
-  const updateTask = useCallback((fileName: string, updatedTask: Partial<Task>) => {
+  const updateTaskParams = useCallback((fileName: string, updatedTask: Partial<EditableTask>) => {
+    setTasksRaw((currentTasks) => (
+      currentTasks
+        .map((currentTask: Task) => {
+          if (currentTask.fileName !== fileName) {
+            return currentTask;
+          }
+
+          return {
+            ...currentTask,
+            ...updatedTask,
+          };
+        })
+        .sort(sortTasks)
+    ));
+  }, []);
+
+  const updateTaskVisibility = useCallback((fileName: string, updatedTask: Partial<TaskVisibility>) => {
     setTasksRaw((currentTasks) => (
       currentTasks
         .map((currentTask: Task) => {
@@ -117,7 +137,8 @@ export function MainProvider({ children }: PropsWithChildren) {
     progress,
     activeHandles,
     globalErrors,
-    updateTask,
+    updateTaskParams,
+    updateTaskVisibility,
     updateMachiningOperationParams,
     renderedTasks,
     globalBounds,
@@ -125,7 +146,7 @@ export function MainProvider({ children }: PropsWithChildren) {
     operationForm,
     taskForm,
     machiningOperations: machiningOperations as MachiningOperations,
-  }), [setTasks, tasks, busy, progress, activeHandles, globalErrors, updateTask, updateMachiningOperationParams, renderedTasks, globalBounds, globalUnits, operationForm, taskForm, machiningOperations]);
+  }), [setTasks, tasks, busy, progress, activeHandles, globalErrors, updateTaskParams, updateTaskVisibility, updateMachiningOperationParams, renderedTasks, globalBounds, globalUnits, operationForm, taskForm, machiningOperations]);
 
   return (
     <mainContext.Provider value={contextValue}>
