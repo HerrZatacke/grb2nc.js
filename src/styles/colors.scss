@@ -1,24 +1,35 @@
 :root {
-  --fill-opacity: 0.1;
-  --fill-outline-opacity: 0.3;
+  --listitem-opacity: 0.25;
+  --fill-opacity: 0.125;
+  --fill-outline-opacity: 0.4;
   --path-opacity: 1;
 
-  --color-fill-drill: rgba(63, 63, 63, var(--fill-opacity));
-  --color-stroke-drill: rgba(63, 63, 63, var(--fill-outline-opacity));
-  --color-path-drill: rgba(63, 63, 63, var(--path-opacity));
+  --color-icon-drill: rgb(94, 94, 94);
+  --color-listitem-drill: rgba(94, 94, 94, var(--listitem-opacity));
+  --color-fill-drill: rgba(94, 94, 94, var(--fill-opacity));
+  --color-stroke-drill: rgba(94, 94, 94, var(--fill-outline-opacity));
+  --color-path-drill: rgba(94, 94, 94, var(--path-opacity));
 
+  --color-icon-edgecut: rgb(127, 127, 127);
+  --color-listitem-edgecut: rgba(127, 127, 127, var(--listitem-opacity));
   --color-fill-edgecut: rgba(127, 127, 127, var(--fill-opacity));
   --color-stroke-edgecut: rgba(127, 127, 127, var(--fill-outline-opacity));
   --color-path-edgecut: rgba(127, 127, 127, var(--path-opacity));
 
-  --color-fill-top: rgba(255, 64, 0, var(--fill-opacity));
-  --color-stroke-top: rgba(255, 64, 0, var(--fill-outline-opacity));
-  --color-path-top: rgba(255, 64, 0, var(--path-opacity));
+  --color-icon-top: rgb(200, 52, 52);
+  --color-listitem-top: rgba(200, 52, 52, var(--listitem-opacity));
+  --color-fill-top: rgba(200, 52, 52, var(--fill-opacity));
+  --color-stroke-top: rgba(200, 52, 52, var(--fill-outline-opacity));
+  --color-path-top: rgba(200, 52, 52, var(--path-opacity));
 
-  --color-fill-bottom: rgba(0, 64, 255, var(--fill-opacity));
-  --color-stroke-bottom: rgba(0, 64, 255, var(--fill-outline-opacity));
-  --color-path-bottom: rgba(0, 64, 255, var(--path-opacity));
+  --color-icon-bottom: rgb(77, 127, 196);
+  --color-listitem-bottom: rgba(77, 127, 196, var(--listitem-opacity));
+  --color-fill-bottom: rgba(77, 127, 196, var(--fill-opacity));
+  --color-stroke-bottom: rgba(77, 127, 196, var(--fill-outline-opacity));
+  --color-path-bottom: rgba(77, 127, 196, var(--path-opacity));
 
+  --color-icon-drawing: rgb(192, 192, 192);
+  --color-listitem-drawing: rgba(192, 192, 192, var(--listitem-opacity));
   --color-fill-drawing: rgba(192, 192, 192, var(--fill-opacity));
   --color-stroke-drawing: rgba(192, 192, 192, var(--fill-outline-opacity));
   --color-path-drawing: rgba(192, 192, 192, var(--path-opacity));

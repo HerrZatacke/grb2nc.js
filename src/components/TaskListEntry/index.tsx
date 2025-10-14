@@ -15,13 +15,15 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import { SvgIconProps } from '@mui/material/SvgIcon';
 import { useTranslations } from 'next-intl';
 import { type ComponentType, useMemo } from 'react';
 import { useMainContext } from '@/components/MainContext';
 import { useDownloadNC } from '@/hooks/useDownloadNC.ts';
+import { getColor } from '@/modules/renderSVG';
 import { Task, TaskType } from '@/types/tasks.ts';
 
-const typeIcon = (type: TaskType): ComponentType => {
+const typeIcon = (type: TaskType): ComponentType<SvgIconProps> => {
   switch (type) {
     case TaskType.DRILL:
       return GpsFixedIcon;
@@ -49,17 +51,25 @@ export default function TaskListEntry({ task }: Props) {
     visibilities.find(({ fileName }) => fileName === task.fileName) || null
   ), [task.fileName, visibilities]);
 
-  const { fileName, type } = task;
+  const { fileName, type, layer } = task;
   const IconComponent = useMemo(() => typeIcon(type), [type]);
 
   if (!taskVisibility) { return null; }
 
   return (
-    <ListItem>
+    <ListItem
+      sx={{
+        background: `var(--color-listitem-${getColor(type, layer)})`,
+      }}
+    >
       <ListItemIcon
         title={t(`typeIconLabel.${type}`)}
       >
-        <IconComponent />
+        <IconComponent
+          sx={{
+            fill: `var(--color-icon-${getColor(type, layer)})`,
+          }}
+        />
       </ListItemIcon>
       <ListItemText primary={fileName} />
       <ButtonGroup
