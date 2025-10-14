@@ -1,4 +1,9 @@
 {
+  "MainMenu": {
+    "isolation": "Manage isolation machining parameters",
+    "drill": "Manage drill machining parameters",
+    "edgecut": "Manage edgecut machining parameters"
+  },
   "TaskListEntry": {
     "typeIconLabel": {
       "isolation": "Isolation",
