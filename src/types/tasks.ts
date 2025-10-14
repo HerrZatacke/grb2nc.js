@@ -19,6 +19,11 @@ export enum Layer {
   OTHER = 'other',
 }
 
+export enum SVGPathType {
+  AREA = 'area',
+  OUTLINE = 'outline',
+}
+
 export interface TaskVisibility {
   fileName: string;
   hidePaths: boolean;
@@ -49,7 +54,8 @@ export interface SVGPathProps {
   fill: string;
   stroke: string;
   strokeWidth: string;
-  hide: boolean;
+  fileName: string;
+  pathType: SVGPathType;
 }
 
 export interface RenderedTask extends TaskWithPolygons {

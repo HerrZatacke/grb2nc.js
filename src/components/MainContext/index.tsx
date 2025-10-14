@@ -153,8 +153,6 @@ export function MainProvider({ children }: PropsWithChildren) {
     visibilities,
   }), [activeHandles, busy, globalBounds, globalErrors, globalUnits, machiningOperations, operationForm, progress, renderedTasks, setTasks, taskForm, tasks, updateMachiningOperationParams, updateTaskParams, updateVisibility, visibilities]);
 
-  console.log({ tasks, visibilities });
-
   return (
     <mainContext.Provider value={contextValue}>
       {children}

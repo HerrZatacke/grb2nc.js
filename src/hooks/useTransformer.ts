@@ -22,7 +22,7 @@ interface UseTransformerParams {
 }
 
 export const useTransformer = (useTransformerParams: UseTransformerParams) => {
-  const { tasks, visibilities, setBusy, setRenderedTasks, setGlobalBounds, setProgress, setGlobalError, resetGlobalError, setGlobalUnits } = useTransformerParams;
+  const { tasks, setBusy, setRenderedTasks, setGlobalBounds, setProgress, setGlobalError, resetGlobalError, setGlobalUnits } = useTransformerParams;
   const workerApi = useRef<Remote<ITansformWorkerApi> | null>(null);
 
   const scale = transformer.getScale();
@@ -65,7 +65,6 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
 
     const params: TransformWorkerParams = {
       tasks,
-      visibilities,
       scale,
     };
 
@@ -74,5 +73,5 @@ export const useTransformer = (useTransformerParams: UseTransformerParams) => {
       .catch((error) => {
         setGlobalError((error as Error).message);
       });
-  }, [resetGlobalError, scale, setBusy, setGlobalBounds, setGlobalError, setGlobalUnits, setProgress, setRenderedTasks, tasks, visibilities]);
+  }, [resetGlobalError, scale, setBusy, setGlobalBounds, setGlobalError, setGlobalUnits, setProgress, setRenderedTasks, tasks]);
 };

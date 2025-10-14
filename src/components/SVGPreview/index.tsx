@@ -2,13 +2,14 @@
 
 import './styles.scss';
 import { useMemo } from 'react';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { useMainContext } from '@/components/MainContext';
 import { Grid } from '@/components/SVGPreview/Grid.tsx';
 import { getViewBox } from '@/modules/renderSVG';
+import { SVGPathType } from '@/types/tasks.ts';
 
 export default function SVGPreview() {
-  const { renderedTasks, globalBounds } = useMainContext();
+  const { renderedTasks, globalBounds, visibilities } = useMainContext();
   const viewBox = useMemo(() => getViewBox(globalBounds), [globalBounds]);
 
   return (
@@ -28,7 +29,24 @@ export default function SVGPreview() {
               renderedTasks.map(({ svgPathProps }, taskIndex) => {
                 return (
                   <g key={`g-${taskIndex}`}>
-                    {svgPathProps.map(({ path, fill, stroke, strokeWidth, hide }, pathIndex) => {
+                    {svgPathProps.map(({ path, fill, stroke, strokeWidth, fileName, pathType }, pathIndex) => {
+                      const visibility = visibilities.find((taskVisibility) => fileName === taskVisibility.fileName) || null;
+                      if (!visibility) { return null; }
+
+                      let hide: boolean;
+
+                      switch(pathType) {
+                        case SVGPathType.AREA:
+                          hide = visibility.hideAreas;
+                          break;
+                        case SVGPathType.OUTLINE:
+                          hide = visibility.hidePaths;
+                          break;
+                        default:
+                          hide = true;
+                          break;
+                      }
+
                       return (
                         !hide && (<path
                             fill={fill}

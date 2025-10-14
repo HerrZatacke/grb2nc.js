@@ -1,11 +1,11 @@
 import type { CircleShape } from '@hpcreery/tracespace-plotter';
 import { circleShapeToSVGPath, getAreaStroke, getColor, getOffsetStroke, polygonsToSVGPaths } from '@/modules/renderSVG';
-import { Polygon } from '@/types/geo';
-import { type RenderedTask, type SVGPathProps, TaskType, TaskVisibility, type TaskWithPolygons } from '@/types/tasks.ts';
+import type { Polygon } from '@/types/geo';
+import { type RenderedTask, type SVGPathProps, SVGPathType, TaskType, type TaskWithPolygons } from '@/types/tasks.ts';
 import { createOffsetPaths } from '@/workers/transformWorker/functions/createOffsetPaths.ts';
 import { RenderTaskParams } from '@/workers/transformWorker/functions/types.ts';
 
-export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWithPolygons: TaskWithPolygons, visibilty: TaskVisibility): Promise<RenderedTask> => {
+export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWithPolygons: TaskWithPolygons): Promise<RenderedTask> => {
   const {
     scale,
     timings,
@@ -18,15 +18,11 @@ export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWit
     polygons,
     drills,
     type,
+    fileName,
     layer,
     steps,
     offset,
   } = taskWithPolygons;
-
-  const {
-    hideAreas,
-    hidePaths,
-  } = visibilty;
 
   const color = getColor(type, layer);
 
@@ -39,7 +35,8 @@ export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWit
     fill: `var(--color-fill-${color})`,
     stroke: `var(--color-stroke-${color})`,
     strokeWidth: getAreaStroke(),
-    hide: hideAreas,
+    fileName,
+    pathType: SVGPathType.AREA,
   }];
 
   const polygonsToSVGPathsDuration = performance.now() - polygonsToSVGPathsStart;
@@ -69,7 +66,8 @@ export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWit
       fill: 'none',
       stroke: `var(--color-path-${color})`,
       strokeWidth: getOffsetStroke(type),
-      hide: hidePaths,
+      fileName,
+      pathType: SVGPathType.OUTLINE,
     })));
   } else {
     svgPathProps.push(...offsetPaths.map((offsetPath: Polygon[]) => {
@@ -80,7 +78,8 @@ export const renderTask = (renderTaskParams: RenderTaskParams) => async (taskWit
           fill: 'none',
           stroke: `var(--color-path-${color})`,
           strokeWidth: getOffsetStroke(type),
-          hide: hidePaths,
+          fileName,
+          pathType: SVGPathType.OUTLINE,
         };
       });
     }).flat());

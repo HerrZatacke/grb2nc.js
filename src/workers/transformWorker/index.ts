@@ -42,7 +42,7 @@ class TansformWorkerApi implements ITansformWorkerApi {
   };
 
   async calculate(params: TransformWorkerParams): Promise<TransformWorkerResult> {
-    const { tasks, visibilities, scale } = params;
+    const { tasks, scale } = params;
     this.progressCount = 0;
     this.progressEstimate = 0;
     this.progressAddEstimate(3);
@@ -142,17 +142,13 @@ class TansformWorkerApi implements ITansformWorkerApi {
     for (let i = 0; i < transformedTasks.length; i++) {
       const task = { ...transformedTasks[i] };
 
-      const visibility = visibilities.find(({ fileName }) => fileName === task.fileName) || null;
-
-      if (!visibility) { continue; }
-
       const result = await renderTask({
         scale,
         timings,
         boardEdgeOffset,
         progressTick: this.progressTick,
         progressAddEstimate: this.progressAddEstimate,
-      })(task, visibility);
+      })(task);
 
       renderedTasks.push(result);
     }
