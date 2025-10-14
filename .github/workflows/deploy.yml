@@ -20,13 +20,25 @@ jobs:
         with:
           node-version: '22.x'
 
+      - name: Add release version to environment variables 🌍
+        run: |
+          node -e "console.log('NEXT_PUBLIC_RELEASE_VERSION=' + require('./package.json').version)" >> $GITHUB_ENV
+
+      - name: Check if tag already exists 🏷
+        id: checkTag
+        uses: mukunku/tag-exists-action@v1.6.0
+        with:
+          tag: ${{ env.NEXT_PUBLIC_RELEASE_VERSION }}
+
       - name: Install npm dependencies 🔗
+        if: steps.checkTag.outputs.exists == 'false'
         run: |
           rm package-lock.json
           npm cache clear -f
           npm install
 
       - name: Build for pages 📖
+        if: steps.checkTag.outputs.exists == 'false'
         env:
           NEXT_PUBLIC_BASE_PATH: /grb2nc.js
           NEXT_PUBLIC_SVG_SCALE: 1000
@@ -37,6 +49,14 @@ jobs:
 
       - name: Deploy to GitHub-Pages 📖
         uses: JamesIves/github-pages-deploy-action@v4.6.1
+        if: steps.checkTag.outputs.exists == 'false'
         with:
           branch: gh-pages
           folder: out-pages
+
+      - name: Create Release 🎉 🥳
+        uses: softprops/action-gh-release@v2.0.5
+        if: steps.checkTag.outputs.exists == 'false'
+        with:
+          tag_name: ${{ env.NEXT_PUBLIC_RELEASE_VERSION }}
+          name: Version ${{ env.NEXT_PUBLIC_RELEASE_VERSION }}

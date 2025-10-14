@@ -14,4 +14,9 @@
   position: absolute;
   bottom: 10px;
   right: 10px;
+
+  &__link {
+    font-size: 13px;
+    opacity: 0.5;
+  }
 }
