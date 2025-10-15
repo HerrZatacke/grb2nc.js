@@ -10,11 +10,13 @@ interface UseDownloadNC {
 }
 
 export const useDownloadNC = (): UseDownloadNC => {
-  const { renderedTasks, machiningOperations } = useMainContext();
+  const { renderedTasks, machiningOperations, globalSettings } = useMainContext();
   const downloadNCCode = useCallback((fileName: string) => {
     const renderedTask = renderedTasks.find((task) => (task.fileName === fileName));
 
     if (!renderedTask || renderedTask.type === TaskType.DRAWING) { return; }
+
+    const { renderOnlyPaths } = globalSettings;
 
     const gCode = generateGCode({
       contours: renderedTask.offsetPaths.flat(1),
@@ -23,10 +25,11 @@ export const useDownloadNC = (): UseDownloadNC => {
       params: machiningOperations[renderedTask.type],
       scale: transformer.getScale(),
       description: `${renderedTask.type} - "${renderedTask.fileName}"`,
+      renderOnlyPaths,
     });
 
     saveAs(new Blob([gCode]), `${renderedTask.fileName}.nc`);
-  }, [machiningOperations, renderedTasks]);
+  }, [globalSettings, machiningOperations, renderedTasks]);
 
   return {
     downloadNCCode,

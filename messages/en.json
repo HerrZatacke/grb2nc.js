@@ -2,7 +2,15 @@
   "MainMenu": {
     "isolation": "Manage isolation machining parameters",
     "drill": "Manage drill machining parameters",
-    "edgecut": "Manage edgecut machining parameters"
+    "edgecut": "Manage edgecut machining parameters",
+    "settings": "Global settings"
+  },
+  "SettingsForm": {
+    "title": "Global settings",
+    "fields": {
+      "renderOnlyPaths": "Generate only gCode for paths",
+      "renderOnlyPathsHelper": "Leave out all additional instructions. (Only output G0 and G1 commands)"
+    }
   },
   "TaskListEntry": {
     "typeIconLabel": {

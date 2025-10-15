@@ -20,6 +20,7 @@ interface GenerateGCodeParams {
   description: string,
   flip: Flip,
   scale: number,
+  renderOnlyPaths: boolean;
 }
 
 export const generateGCode = (generationParams: GenerateGCodeParams): string => {
@@ -30,6 +31,7 @@ export const generateGCode = (generationParams: GenerateGCodeParams): string => 
     description,
     flip,
     scale,
+    renderOnlyPaths,
   } = generationParams;
   const machiningContext = createMachiningContext(params, flip, scale);
 
@@ -53,6 +55,15 @@ export const generateGCode = (generationParams: GenerateGCodeParams): string => 
       '',
       ...generateDrills(drills, machiningContext),
     );
+  }
+
+  if (renderOnlyPaths) {
+    return lines.filter((line) => (
+      line.startsWith('G0') ||
+      line.startsWith('G1') ||
+      line.startsWith('(') ||
+      line === ''
+    )).join('\n');
   }
 
   return withEnvelope(lines, machiningContext).join('\n');
