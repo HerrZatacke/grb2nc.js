@@ -9,7 +9,9 @@
     "title": "Global settings",
     "fields": {
       "renderOnlyPaths": "Generate only gCode for paths",
-      "renderOnlyPathsHelper": "Leave out all additional instructions. (Only output G0 and G1 commands)"
+      "renderOnlyPathsHelper": "Leave out all additional instructions. (Only output G0 and G1 commands)",
+      "useSimpleFileInput": "Use simple file input field",
+      "useSimpleFileInputHelper": "Enable if you have problems using the “Watch files“ dialog"
     }
   },
   "TaskListEntry": {

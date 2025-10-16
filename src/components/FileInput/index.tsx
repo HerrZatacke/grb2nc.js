@@ -7,7 +7,7 @@ import { useFileReader } from '@/hooks/useFileReader.ts';
 
 
 export default function FileInput() {
-  const { activeHandles } = useMainContext();
+  const { activeHandles, globalSettings: { useSimpleFileInput } } = useMainContext();
   const t = useTranslations('FileInput');
 
   const {
@@ -20,7 +20,7 @@ export default function FileInput() {
 
   return (
     <div>
-      {canUseFilePicker ? (
+      {canUseFilePicker && !useSimpleFileInput ? (
         <Button
           onClick={requestInputHandle}
           disabled={busy}

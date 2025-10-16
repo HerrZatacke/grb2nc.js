@@ -103,8 +103,10 @@ export function MainProvider({ children }: PropsWithChildren) {
   }, []);
 
   const updateMachiningOperationParams = useCallback((taskType: TaskType, update: Partial<MachiningParams>) => {
-    const currentOperations = machiningOperations || machiningDefaultOperations();
+    const defaultOperations = machiningDefaultOperations();
+    const currentOperations = machiningOperations || defaultOperations;
     const updatedParams: MachiningParams = {
+      ...defaultOperations,
       ...currentOperations[taskType],
       ...update,
     };
@@ -116,9 +118,11 @@ export function MainProvider({ children }: PropsWithChildren) {
   }, [machiningOperations, setMachiningOperations]);
 
   const updateGlobalSettings = useCallback((newGlobalSettings: Partial<GlobalSettings>) => {
-    const currentFlobalSettings = globalSettings || defaultSettings();
+    const defaultGlobalSettings = defaultSettings();
+    const currentGlobalSettings = globalSettings || defaultGlobalSettings;
     const updatedGlobalSettings: GlobalSettings = {
-      ...currentFlobalSettings,
+      ...defaultGlobalSettings,
+      ...currentGlobalSettings,
       ...newGlobalSettings,
     };
     setGlobalSettings(updatedGlobalSettings);

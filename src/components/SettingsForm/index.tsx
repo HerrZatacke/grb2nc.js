@@ -43,6 +43,24 @@ export default function SettingsForm() {
               {t('fields.renderOnlyPathsHelper')}
             </FormHelperText>
           </FormControl>
+
+          <FormControl>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={globalSettings.useSimpleFileInput}
+                  onChange={(_, checked) => {
+                    updateGlobalSettings({ useSimpleFileInput: checked });
+                  }}
+                />
+              }
+              label={t('fields.useSimpleFileInput')}
+            >
+            </FormControlLabel>
+            <FormHelperText>
+              {t('fields.useSimpleFileInputHelper')}
+            </FormHelperText>
+          </FormControl>
         </Stack>
       </DialogContent>
     </Dialog>
