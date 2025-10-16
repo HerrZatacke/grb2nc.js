@@ -1,5 +1,5 @@
 import { identifyLayers, type LayerIdentity } from '@tracespace/identify-layers';
-import { type ChangeEvent, useCallback, useEffect, useState } from 'react';
+import { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useMainContext } from '@/components/MainContext';
 import { Layer, Task, TaskType, TaskVisibility } from '@/types/tasks.ts';
 
@@ -7,6 +7,7 @@ export interface UseFileReader {
   canUseFilePicker: boolean;
   onFileInputChange: (ev: ChangeEvent<HTMLInputElement>) => Promise<void>;
   requestInputHandle: () => void;
+  extensions: `.${string}`[];
 }
 
 export interface CreateTasksResult {
@@ -39,9 +40,6 @@ export const getOffset = (type: TaskType): number => {
   }
 };
 
-
-const extensions: `.${string}`[] = ['.gbr', '.drl'];
-
 const tasksAreEqual = (arr1: Task[], arr2: Task[]): boolean => {
   if (arr1.length !== arr2.length) return false;
 
@@ -63,6 +61,7 @@ export const useFileReader = (): UseFileReader => {
   const { tasks, setTasks, setActiveHandles, setVisibilities } = useMainContext();
   const [fileHandles, setFileHandles] = useState<FileSystemFileHandle[]>();
   const [canUseFilePicker, setCanUseFilePicker] = useState(false);
+  const extensions: `.${string}`[] = useMemo(() => (['.gbr', '.drl']), []);
 
   useEffect(() => {
     setCanUseFilePicker(typeof window.showOpenFilePicker === 'function');
@@ -86,7 +85,7 @@ export const useFileReader = (): UseFileReader => {
       setFileHandles([]);
       setActiveHandles(0);
     }
-  }, [setActiveHandles]);
+  }, [extensions, setActiveHandles]);
 
   const createTaskFromFile = useCallback(async (taskFile: File, identity: LayerIdentity): Promise<CreateTasksResult> => {
     const name = (taskFile.name as string).toLowerCase();
@@ -160,7 +159,7 @@ export const useFileReader = (): UseFileReader => {
     };
 
     return { task, taskVisibility };
-  }, []);
+  }, [extensions]);
 
   const setUpdatedResults = useCallback((createTaskResults: CreateTasksResult[]) => {
     const newTasks = createTaskResults.reduce((acc: Task[], { task }): Task[] => (
@@ -223,5 +222,6 @@ export const useFileReader = (): UseFileReader => {
     canUseFilePicker,
     onFileInputChange,
     requestInputHandle,
+    extensions,
   };
 };

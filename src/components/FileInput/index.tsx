@@ -14,6 +14,7 @@ export default function FileInput() {
     canUseFilePicker,
     onFileInputChange,
     requestInputHandle,
+    extensions,
   } = useFileReader();
 
   const { busy } = useMainContext();
@@ -39,6 +40,7 @@ export default function FileInput() {
             hidden
             disabled={busy}
             onChange={onFileInputChange}
+            accept={extensions.join(',')}
           />
         </Button>
       )}
