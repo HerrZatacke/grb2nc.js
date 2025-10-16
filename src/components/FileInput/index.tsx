@@ -40,7 +40,7 @@ export default function FileInput() {
             hidden
             disabled={busy}
             onChange={onFileInputChange}
-            accept={['.zip', ...extensions].join(',')}
+            accept={extensions.join(',')}
           />
         </Button>
       )}

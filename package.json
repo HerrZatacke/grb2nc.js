@@ -36,6 +36,7 @@
     "eslint": "^9.36.0",
     "eslint-config-next": "15.5.4",
     "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
     "next": "15.5.4",
     "next-intl": "^4.3.12",
     "ohash": "^2.0.11",

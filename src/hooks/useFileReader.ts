@@ -1,4 +1,5 @@
 import { identifyLayers, type LayerIdentity } from '@tracespace/identify-layers';
+import JSZip, { type JSZipObject } from 'jszip';
 import { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useMainContext } from '@/components/MainContext';
 import { Layer, Task, TaskType, TaskVisibility } from '@/types/tasks.ts';
@@ -61,7 +62,7 @@ export const useFileReader = (): UseFileReader => {
   const { tasks, setTasks, setActiveHandles, setVisibilities } = useMainContext();
   const [fileHandles, setFileHandles] = useState<FileSystemFileHandle[]>();
   const [canUseFilePicker, setCanUseFilePicker] = useState(false);
-  const extensions: `.${string}`[] = useMemo(() => (['.gbr', '.drl']), []);
+  const extensions: `.${string}`[] = useMemo(() => (['.zip', '.gbr', '.drl']), []);
 
   useEffect(() => {
     setCanUseFilePicker(typeof window.showOpenFilePicker === 'function');
@@ -87,14 +88,39 @@ export const useFileReader = (): UseFileReader => {
     }
   }, [extensions, setActiveHandles]);
 
-  const createTaskFromFile = useCallback(async (taskFile: File, identity: LayerIdentity): Promise<CreateTasksResult> => {
+  const createTasksFromFile = useCallback(async (taskFile: File, identity: LayerIdentity): Promise<CreateTasksResult[]> => {
     const name = (taskFile.name as string).toLowerCase();
     const ext = name.split('.').pop() || '';
+
+    if (ext === 'zip') {
+      const zip = await JSZip.loadAsync(taskFile);
+
+      const fileNames = Object.keys(zip.files).filter((fileName) => !fileName.endsWith('.zip'));
+
+      const zipLayerMapping = identifyLayers(fileNames);
+
+      const files = (await Promise.all(fileNames.map(async (fileName): Promise<File | null> => {
+        const zipEntry: JSZipObject = zip.files[fileName];
+        const fileContent = await zipEntry.async('blob');
+
+        if (zipEntry.dir) { return null; }
+
+        return new File([fileContent], fileName, { lastModified: zipEntry.date.getTime(), type: 'text/plain' });
+      }))).filter(Boolean) as File[];
+
+      return (await Promise.all(files.map(async (file: File): Promise<CreateTasksResult[]> => {
+        const zipEntryIdentity = zipLayerMapping[file.name];
+        try {
+          return createTasksFromFile(file, zipEntryIdentity);
+        } catch {
+          return [];
+        }
+      })))
+        .flat(1);
+    }
+
     if (!extensions.includes(`.${ext}`)) {
-      return {
-        task: null,
-        taskVisibility: null,
-      };
+      return [];
     }
 
     let hideAreas = true;
@@ -158,7 +184,7 @@ export const useFileReader = (): UseFileReader => {
       hideAreas,
     };
 
-    return { task, taskVisibility };
+    return [{ task, taskVisibility }];
   }, [extensions]);
 
   const setUpdatedResults = useCallback((createTaskResults: CreateTasksResult[]) => {
@@ -183,16 +209,16 @@ export const useFileReader = (): UseFileReader => {
       const layerMapping = identifyLayers(fileHandles.map((handle) => (handle.name)));
 
       const createTaskResults: CreateTasksResult[] = (await Promise.all(
-        fileHandles.map(async (handle): Promise<CreateTasksResult> => {
+        fileHandles.map(async (handle): Promise<CreateTasksResult[]> => {
           const identity = layerMapping[handle.name];
           try {
             const file = await handle.getFile();
-            return createTaskFromFile(file, identity);
+            return createTasksFromFile(file, identity);
           } catch {
-            return { taskVisibility: null, task: null };
+            return [];
           }
         }),
-      ));
+      )).flat(1);
 
       setUpdatedResults(createTaskResults);
     };
@@ -201,7 +227,7 @@ export const useFileReader = (): UseFileReader => {
     updateHandles();
 
     return () => window.clearInterval(intervalHandle);
-  }, [createTaskFromFile, fileHandles, setUpdatedResults]);
+  }, [createTasksFromFile, fileHandles, setUpdatedResults]);
 
   const onFileInputChange = useCallback(async (ev: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const input = ev.currentTarget;
@@ -209,14 +235,14 @@ export const useFileReader = (): UseFileReader => {
 
     const layerMapping = identifyLayers([...input.files].map((handle) => (handle.name)));
 
-    const newTasks: (CreateTasksResult)[] = await Promise.all([...input.files].map((file): Promise<CreateTasksResult> => {
+    const newTasks: (CreateTasksResult)[] = (await Promise.all([...input.files].map((file): Promise<CreateTasksResult[]> => {
       const identity = layerMapping[file.name];
-      return createTaskFromFile(file, identity);
-    }));
+      return createTasksFromFile(file, identity);
+    }))).flat(1);
 
     input.value = '';
     setUpdatedResults(newTasks);
-  }, [createTaskFromFile, setUpdatedResults]);
+  }, [createTasksFromFile, setUpdatedResults]);
 
   return {
     canUseFilePicker,
