@@ -246,10 +246,10 @@ class Transformer {
     startAngle: number,
     endAngle: number,
   ): Polygon {
-    const f = .02;
+    const f = 25;
     const arcLength = Math.abs(endAngle - startAngle) * r;
-    const estimated = Math.pow(2, Math.ceil(Math.log2(arcLength / f)));
-    const numPoints = Math.max(8, Math.min(estimated, 64));
+    const estimated = Math.pow(2, Math.ceil(Math.log2(arcLength * f)));
+    const numPoints = Math.max(8, estimated);
 
     const points: Polygon = [];
     const step = (endAngle - startAngle) / (numPoints - 1);
