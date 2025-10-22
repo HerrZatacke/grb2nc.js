@@ -14,7 +14,7 @@ export const machiningDefaultParams = (taskType: TaskType): MachiningParams => {
         cutDepth: '-1.8',
         stepDepth: '1.0', // peck depth
         feedRateXY: '0', // not required/no milling
-        plungeSpeed: '25',
+        plungeSpeed: '150',
         spindleSpeed: '10000',
       };
 
@@ -28,8 +28,8 @@ export const machiningDefaultParams = (taskType: TaskType): MachiningParams => {
         workHeight: '0',
         cutDepth: '-0.1', // copper thickness
         stepDepth: '0.1',
-        feedRateXY: '70',
-        plungeSpeed: '70',
+        feedRateXY: '80', // 20° engraver bit (40F for 10°)
+        plungeSpeed: '80',
         spindleSpeed: '10000',
       };
 
@@ -43,8 +43,8 @@ export const machiningDefaultParams = (taskType: TaskType): MachiningParams => {
         workHeight: '0',
         cutDepth: '-1.8',
         stepDepth: '0.9', // pass depth
-        feedRateXY: '60',
-        plungeSpeed: '60',
+        feedRateXY: '45',
+        plungeSpeed: '40',
         spindleSpeed: '10000',
       };
 
