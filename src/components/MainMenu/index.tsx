@@ -17,7 +17,15 @@ export default function MainMenu() {
   const t = useTranslations('MainMenu');
 
   return (
-    <Stack direction="row" gap={1}>
+    <Stack direction="row" gap={1} flexWrap="wrap">
+      <ButtonGroup size="large" variant="contained" disabled={busy}>
+        <Button
+          title={t('settings')}
+          onClick={() => setShowSettings(true)}
+        >
+          <SettingsIcon />
+        </Button>
+      </ButtonGroup>
       <ButtonGroup size="large" variant="contained" disabled={busy}>
         <FileInput />
       </ButtonGroup>
@@ -39,14 +47,6 @@ export default function MainMenu() {
           onClick={() => setOperationForm(TaskType.EDGE_CUT)}
         >
           <CarpenterIcon />
-        </Button>
-      </ButtonGroup>
-      <ButtonGroup size="large" variant="contained" disabled={busy}>
-        <Button
-          title={t('settings')}
-          onClick={() => setShowSettings(true)}
-        >
-          <SettingsIcon />
         </Button>
       </ButtonGroup>
     </Stack>

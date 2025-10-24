@@ -1,10 +1,7 @@
-import Error from '@/components/Error';
-import MainMenu from '@/components/MainMenu';
 import OperationForm from '@/components/OperationForm';
-import Progress from '@/components/Progress';
+import PageContent from '@/components/PageContent';
 import SettingsForm from '@/components/SettingsForm';
 import SVGPreview from '@/components/SVGPreview';
-import TaskList from '@/components/TaskList';
 import TaskParamsForm from '@/components/TaskParamsForm';
 
 export default function Home() {
@@ -15,12 +12,7 @@ export default function Home() {
       <OperationForm />
       <TaskParamsForm />
       <SettingsForm />
-      <div className="page-content">
-        <MainMenu />
-        <TaskList />
-        <Error />
-        <Progress />
-      </div>
+      <PageContent />
       <footer className="page-footer">
         <a
           className="page-footer__link"

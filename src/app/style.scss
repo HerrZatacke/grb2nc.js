@@ -1,15 +1,6 @@
 @use '../styles/base';
 @use '../styles/colors';
 
-.page-content {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .page-footer {
   position: absolute;
   bottom: 10px;

@@ -1,0 +1,24 @@
+
+.page-content {
+  --menu-width: 450px;
+
+  @media screen and (max-width: 480px) {
+    --menu-width: calc(100vw - 70px);
+  }
+
+  position: absolute;
+  top: 10px;
+  left: calc(-1 * var(--menu-width));
+  width: var(--menu-width);
+  transition: left 300ms ease-in-out;
+
+  &--expanded {
+    left: 10px;
+  }
+
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
