@@ -1,7 +1,7 @@
 {
   "name": "gerber2nc-js",
   "private": true,
-  "version": "1.0.6",
+  "version": "1.0.7",
   "type": "module",
   "scripts": {
     "dev": "next dev",
@@ -49,6 +49,6 @@
     "sass": "^1.92.0",
     "sass-embedded": "^1.92.1",
     "typescript": "~5.6.2",
-    "vite": "7.1.5"
+    "vite": "7.1.12"
   }
 }
