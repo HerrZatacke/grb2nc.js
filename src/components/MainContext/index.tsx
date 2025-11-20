@@ -177,7 +177,27 @@ export function MainProvider({ children }: PropsWithChildren) {
     updateTaskParams,
     updateVisibility,
     visibilities,
-  }), [activeHandles, busy, globalBounds, globalErrors, globalSettings, globalUnits, machiningOperations, operationForm, progress, renderedTasks, setTasks, showSettings, taskForm, tasks, updateMachiningOperationParams, updateTaskParams, updateVisibility, visibilities]);
+  }), [
+    activeHandles,
+    busy,
+    globalBounds,
+    globalErrors,
+    globalSettings,
+    globalUnits,
+    machiningOperations,
+    operationForm,
+    progress,
+    renderedTasks,
+    setTasks,
+    showSettings,
+    taskForm,
+    tasks,
+    updateGlobalSettings,
+    updateMachiningOperationParams,
+    updateTaskParams,
+    updateVisibility,
+    visibilities,
+  ]);
 
   return (
     <mainContext.Provider value={contextValue}>

@@ -20,7 +20,7 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input,
-    }
+    },
   },
   server: {
     port: 3000,
