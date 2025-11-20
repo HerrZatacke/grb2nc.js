@@ -6,7 +6,7 @@
     --menu-width: calc(100vw - 70px);
   }
 
-  position: absolute;
+  position: fixed;
   top: 10px;
   left: calc(-1 * var(--menu-width));
   width: var(--menu-width);

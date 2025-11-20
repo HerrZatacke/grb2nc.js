@@ -13,9 +13,9 @@ export default function Home() {
       <TaskParamsForm />
       <SettingsForm />
       <PageContent />
-      <footer className="page-footer">
+      <footer className="layout__footer">
         <a
-          className="page-footer__link"
+          className="layout__footer-link"
           href="https://github.com/HerrZatacke/grb2nc.js"
           target="_blank"
         >

@@ -1,12 +1,18 @@
 @use '../styles/base';
 @use '../styles/colors';
 
-.page-footer {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
+.layout {
+  height: 100dvh;
+  width: 100dvh;
 
-  &__link {
+  &__footer {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+
+  }
+
+  &__footer-link {
     font-size: 13px;
     opacity: 0.5;
   }
