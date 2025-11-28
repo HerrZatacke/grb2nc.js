@@ -1,5 +1,5 @@
 {
-  "name": "gerber2nc-js",
+  "name": "grb2nc.js",
   "private": true,
   "version": "1.0.0",
   "type": "module",
